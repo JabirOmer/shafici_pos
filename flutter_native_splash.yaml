@@ -1,0 +1,18 @@
+# dart run flutter_native_splash:remove
+# dart run flutter_native_splash:create
+
+flutter_native_splash:
+  color: "#ffffff"               # The background color hex code
+  image: assets/images/mizan-logo-small-and-rounded.png  # Path to your splash image
+  
+  # # Optional Settings
+  # color_dark: "#000000"          # Background color for dark mode
+  # image_dark: assets/images/splash_logo_dark.png # Image for dark mode
+  
+  android_12:
+    image: assets/images/mizan-logo-small-and-rounded.png # Required icon for Android 12+ 
+    color: "#ffffff"
+
+  android: true                  # Enable for Android
+  ios: true                      # Enable for iOS
+  web: false                     # Set to true if you target web

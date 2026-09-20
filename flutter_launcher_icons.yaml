@@ -1,0 +1,27 @@
+# dart run flutter_launcher_icons
+
+flutter_launcher_icons:
+  image_path: "assets/images/shafici-logo.jpg"
+
+  # ANDROID
+  android: true
+  # or android: "launcher_icon" to set a custom icon name
+  adaptive_icon_background: "#ffffff" # or a hex color like "#ffffff"
+  adaptive_icon_foreground: "assets/images/shafici-icon.png"
+  min_sdk_android: 21 # falls back to non-adaptive icon below this
+
+  # iOS
+  ios: true
+  remove_alpha_ios: true      # strips transparency, avoids App Store rejection
+  # image_path_ios: "assets/icon/icon_ios.png" # optional, use a diff image w/o transparency
+
+  # macOS
+  macos:
+    generate: true
+    # image_path: "assets/icon/icon_macos.png" # optional separate source image
+
+  # Windows
+  windows:
+    generate: true
+    # image_path: "assets/icon/icon_windows.png" # optional
+    icon_size: 48 # 16, 32, 48, or 256
