@@ -57,8 +57,6 @@ class SalesProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-
-    await Future.delayed(Duration(seconds: 1));
     
     try {
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
@@ -113,8 +111,6 @@ class SalesProvider extends ChangeNotifier {
     _sendErrorMessage = null;
     _sendSuccessMessage = null;
     notifyListeners();
-
-    await Future.delayed(Duration(seconds: 3));
 
     try {
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
