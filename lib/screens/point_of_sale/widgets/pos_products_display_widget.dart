@@ -74,10 +74,11 @@ class _PosProductsDisplayWidgetState extends State<PosProductsDisplayWidget> {
   //   });
   // }
 
+        // (r) => r.toLowerCase().contains(value.toLowerCase()) 
   void _handleSearch(String value) {
     final products = widget.products.where(
-      (p) => [p.productName, p.productBarcode].any(
-        (r) => r.toLowerCase().contains(value.toLowerCase()) 
+      (p) => [p.productName, p.productBarcode, p.batchNumber].any(
+        (r) => r != null && r.toLowerCase().contains(value.toLowerCase())
       )
     ).toList();
 
@@ -426,7 +427,7 @@ class _PosProductsDisplayWidgetState extends State<PosProductsDisplayWidget> {
                       ),
                       padding: EdgeInsets.all(4),
                       child: UiTitleWidget(
-                        text: CHelperFunctions.capitalizeWords('B#: ${product.batchNumber ?? '001'}'),
+                        text: CHelperFunctions.capitalizeWords(product.batchNumber != null ? 'B#: ${product.batchNumber}' : 'no-batch'),
                         bold: false,
                         customSize: 12,
                         defaultText: true,

@@ -59,7 +59,9 @@ class _ProductsDisplayWidgetState extends State<ProductsDisplayWidget> {
     // setState(() {});
 
     final products = widget.products.where(
-      (p) => [p.productName, p.productBarcode].any((r) => r.toLowerCase().contains(value.toLowerCase()))
+      (p) => [p.productName, p.productBarcode, p.productCode].any(
+        (r) => r != null && r.toLowerCase().contains(value.toLowerCase())
+      )
     ).toList();
 
     setState(() {
