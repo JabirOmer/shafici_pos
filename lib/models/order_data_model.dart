@@ -70,7 +70,7 @@ class OrderDataModel extends HiveObject {
       'order_calculation': orderCalculation.toJson(),
       'order_payments': orderPayments.map((payment) => payment.toJson()).toList(),
       'total_change': totalChange,
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
     };
   }
 }
