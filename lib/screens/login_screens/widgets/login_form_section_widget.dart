@@ -71,7 +71,7 @@ class LoginFormSectionWidget extends StatelessWidget {
 
                           SizedBox(width: CSizes.mediumGap,),
 
-                          UiTitleWidget(text: 'Mizan POS', defaultText: true, bigger: true,)
+                          UiTitleWidget(text: 'Shafici POS', defaultText: true, bigger: true,)
                         ],
                       ),
 
@@ -80,8 +80,8 @@ class LoginFormSectionWidget extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          UiTitleWidget(text: 'Merchant:', medium: true,),
-                          UiTitleWidget(text: deviceData?.businessName ?? '---', medium: true,)
+                          UiTitleWidget(text: 'Branch:', medium: true,),
+                          UiTitleWidget(text: deviceData?.branchName ?? '---', medium: true,)
                         ],
                       ),
 
