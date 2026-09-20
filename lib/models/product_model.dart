@@ -55,6 +55,9 @@ class ProductModel extends HiveObject {
   @HiveField(15)
   final DateTime? updatedAt;
 
+  @HiveField(16)
+  final String? batchNumber;
+
 
   ProductModel({
     required this.productId,
@@ -73,6 +76,7 @@ class ProductModel extends HiveObject {
     required this.isTaxable,
     this.updatedAt,
     this.createdAt,
+    this.batchNumber,
   });
 
 
@@ -87,7 +91,6 @@ class ProductModel extends HiveObject {
       productId: product['product_id'],
       categoryId: product['category_id'],
       categoryName: product['category_name'],
-      productCode: product['product_code'],
       productBarcode: product['product_barcode'] == product['product_code'] ? '---' : product['product_barcode'],
       productName: product['product_name'],
       unitCost: cost,
@@ -100,12 +103,13 @@ class ProductModel extends HiveObject {
       isTaxable: product['is_taxable'],
       createdAt: DateTime.tryParse(product['created_at'])?.toLocal(),
       updatedAt: DateTime.tryParse(product['updated_at'])?.toLocal(),
+      productCode: product['product_code'],
+      batchNumber: (product['batch_number']),
     );
   }
 
 
   Map<String, dynamic> toJson() {
-    // final String? isoDate = updatedAt?.toIso8601String();
     return {
       "product_id": productId,
       "product_name": productName,

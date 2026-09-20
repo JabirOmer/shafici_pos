@@ -39,6 +39,8 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
   final GlobalKey<FormState> _productFormKey = GlobalKey<FormState>();
   final _productNameController = TextEditingController();
   final _barcodeController = TextEditingController();
+  final _brandController = TextEditingController();
+  final _batchNumberController = TextEditingController();
   bool _openCategoriesDropDown = false;
   ProductCategoryModel? _selectedCategory;
   final _expireDateController = TextEditingController();
@@ -228,7 +230,9 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
         onDiscountPrice: double.parse(_sellingPriceController.text), 
         isTaxable: _isTaxable,
         stockQuanity: int.parse(_stockQtyController.text), 
-        alertQuantity: int.parse(_alertQtyController.text)
+        alertQuantity: int.parse(_alertQtyController.text),
+        productCode: _brandController.text,
+        batchNumber: _batchNumberController.text,
       ).toJson();
       widget.onSubmit(productData); 
     }
@@ -349,6 +353,29 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
                           ),
                     
                           
+                          SizedBox(height: CSizes.largeGap,),
+
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: UiTextFieldWidget(
+                                  textController: _brandController,
+                                  label: 'product brand',
+                                ),
+                              ),
+
+                              SizedBox(width: CSizes.mediumGap,),
+
+                              Expanded(
+                                child: UiTextFieldWidget(
+                                  textController: _batchNumberController,
+                                  label: 'Batch number',
+                                ),
+                              ),
+                            ],
+                          ),
+
                           SizedBox(height: CSizes.largeGap,),
                     
                           

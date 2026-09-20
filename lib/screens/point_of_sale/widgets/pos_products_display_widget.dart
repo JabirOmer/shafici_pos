@@ -426,7 +426,7 @@ class _PosProductsDisplayWidgetState extends State<PosProductsDisplayWidget> {
                       ),
                       padding: EdgeInsets.all(4),
                       child: UiTitleWidget(
-                        text: CHelperFunctions.capitalizeWords('B#: 0001'),
+                        text: CHelperFunctions.capitalizeWords('B#: ${product.batchNumber ?? '001'}'),
                         bold: false,
                         customSize: 12,
                         defaultText: true,

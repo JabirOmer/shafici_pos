@@ -117,6 +117,12 @@ class ProductDetailsDisplayWidget extends StatelessWidget {
                             title: 'barcode :',
                             value: product.productBarcode,
                           ),
+
+                          // - - - Product Name
+                          _productInfoTile(
+                            title: 'Batch number :',
+                            value: product.batchNumber ?? '---',
+                          ),
           
                           // - - - Category
                           _productInfoTile(

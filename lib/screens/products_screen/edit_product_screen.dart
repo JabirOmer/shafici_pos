@@ -44,6 +44,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _productNameController = TextEditingController();
   final _barcodeController = TextEditingController();
   final _productCodeController = TextEditingController();
+  final _batchNumberController = TextEditingController();
   final _expireDateController = TextEditingController();
   final _exchangeRateController = TextEditingController();
   final _usdCostController = TextEditingController();
@@ -183,6 +184,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
             expireDate: _expireDateController.text.isNotEmpty ? CHelperFunctions.formateStringToDate(value: _expireDateController.text) : widget.product.expireDate, 
             isTaxable: widget.product.isTaxable,
             createdAt: widget.product.createdAt,
+            productCode: _productCodeController.text.isNotEmpty ? _productCodeController.text : widget.product.productCode,
+            batchNumber: _batchNumberController.text.isNotEmpty ? _batchNumberController.text : widget.product.batchNumber,
             updatedAt: DateTime.now()
           );
           
@@ -289,11 +292,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                                                 
                                 SizedBox(height: CSizes.largeGap,),
                                                                 
-                                // Brand Code
+                                // Product Code
                                 _editProductTitle(
-                                  label: 'Brand Code', 
+                                  label: 'Product Code', 
                                   initial: widget.product.productCode ?? '---',
-                                  controller: _barcodeController, 
+                                  controller: _productCodeController, 
                                   validator: (value) {return null;},
                                   onChange: (value) {},
                                 ),
@@ -305,6 +308,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                   label: 'barcode', 
                                   initial: widget.product.productBarcode,
                                   controller: _barcodeController, 
+                                  validator: (value) {return null;},
+                                  onChange: (value) {},
+                                ),
+                                      
+                                SizedBox(height: CSizes.largeGap,),
+
+                                // Batch number
+                                _editProductTitle(
+                                  label: 'Batch number', 
+                                  initial: widget.product.batchNumber ?? '---',
+                                  controller: _batchNumberController, 
                                   validator: (value) {return null;},
                                   onChange: (value) {},
                                 ),
@@ -366,7 +380,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 SizedBox(height: CSizes.largeGap,),
               
                                 _editProductTitle(
-                                  label: 'new cost (USD)', 
+                                  label: 'cost (USD)', 
                                   initial: widget.product.unitCostInUSD == null ? '---' : '\$${CHelperFunctions.formatNumberWithComma(widget.product.unitCostInUSD!)}',
                                   controller: _usdCostController, 
                                   validator: (value) => _validateUSDCost(value),
@@ -378,7 +392,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 
                                 // Cost In Birr
                                 _editProductTitle(
-                                  label: 'new cost (Birr)', 
+                                  label: 'cost (Birr)', 
                                   initial: '${CHelperFunctions.formatNumberWithComma(widget.product.unitCost)} Birr',
                                   controller: _birrCostController, 
                                   validator: (value) => _validateBirrCost(value),
@@ -401,7 +415,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                               
                                 // Profit
                                 _editProductTitle(
-                                  label: 'new profit', 
+                                  label: 'profit', 
                                   initial: '${CHelperFunctions.formatNumberWithComma(widget.product.sellingPrice - widget.product.unitCost)} Birr',
                                   controller: _profitController,
                                   readOnly: true,
@@ -423,7 +437,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               
                                 // Stock Quantity
                                 _editProductTitle(
-                                  label: 'new stock quantity', 
+                                  label: 'stock quantity', 
                                   initial: CHelperFunctions.formatNumberWithComma(widget.product.stock),
                                   controller: _stockQtyController,
                                   validator: (value) => _validateStockQty(value),
@@ -434,7 +448,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               
                                 // Stock Alert
                                 _editProductTitle(
-                                  label: 'new stock alert', 
+                                  label: 'stock alert', 
                                   initial: CHelperFunctions.formatNumberWithComma(widget.product.alertQuantity),
                                   controller: _alertQtyController,
                                   validator: (value) => _validateAlertQty(value),
@@ -521,6 +535,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           Expanded(
             flex: 2,
             child: UiTextFieldWidget(
+              label: label,
               initialValue: initial,
               readOnly: true,
               // enabled: false,
@@ -533,7 +548,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             flex: 3,
             child: UiTextFieldWidget(
               textController: controller,
-              label: label,
+              label: 'new $label',
               keyboardType: keyboardType,
               validator: (value) => validator(value),
               onChange: (value) => onChange(value),

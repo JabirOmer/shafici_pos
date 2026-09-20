@@ -81,11 +81,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         isTaxable: product.isTaxable,
         stockQuanity: product.stock, 
         alertQuantity: product.alertQuantity,
+        productCode: product.productCode,
+        batchNumber: product.batchNumber,
       ).toJson()..addAll({ "product_id": product.productId });
 
 
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
       final response = await _apiServices.patchRequest(url: CUrlStrings.updateProductUrl, data: dataMap, authToken: deviceToken);
+
+      print(dataMap);
 
       switch (response.statusCode) {
         case 200: {

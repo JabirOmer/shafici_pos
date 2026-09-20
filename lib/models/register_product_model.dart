@@ -12,6 +12,8 @@ class RegisterProductModel {
   final bool isTaxable;
   final int stockQuanity;
   final int alertQuantity;
+  final String? productCode;
+  final String? batchNumber;
 
 
   RegisterProductModel({
@@ -26,6 +28,8 @@ class RegisterProductModel {
     required this.isTaxable,
     required this.stockQuanity,
     required this.alertQuantity,
+    required this.productCode,
+    required this.batchNumber,
   });
 
 
@@ -42,6 +46,8 @@ class RegisterProductModel {
       "is_taxable": isTaxable,
       "stock_quantity": stockQuanity,
       "alert_quantity": alertQuantity,
+      "product_code": productCode,
+      "batch_number": batchNumber,
     };
   }
 }

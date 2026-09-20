@@ -2,9 +2,9 @@ class CUrlStrings {
   CUrlStrings._();
 
   
-  // static String baseUrl = 'http://localhost:4040';
+  static String baseUrl = 'http://localhost:4040';
   // static String baseUrl = 'https://wasl-pos-server-7alsz.ondigitalocean.app';
-  static String baseUrl = 'https://wasl-server-snvsj.ondigitalocean.app';
+  // static String baseUrl = 'https://wasl-server-snvsj.ondigitalocean.app';
 
 
   // - - - Device
