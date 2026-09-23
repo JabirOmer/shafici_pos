@@ -118,7 +118,7 @@ class _ProductsDisplayWidgetState extends State<ProductsDisplayWidget> {
                     ConstrainedBox(
                       constraints: BoxConstraints(maxWidth: 300),
                       child: UiTextFieldWidget(
-                        label: 'Search Name or Barcode',
+                        label: 'search name, barcode or brand',
                         defaultLabel: true,
                         textController: _searchController,
                         onChange: (value) => _handleSearch(value),

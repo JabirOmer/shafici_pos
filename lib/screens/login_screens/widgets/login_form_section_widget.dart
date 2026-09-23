@@ -65,13 +65,13 @@ class LoginFormSectionWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/mizan-logo-small-and-rounded.png',
+                            'assets/images/shafici-icon.png',
                             height: 40,
                           ),
 
                           SizedBox(width: CSizes.mediumGap,),
 
-                          UiTitleWidget(text: 'Shafici POS', defaultText: true, bigger: true,)
+                          UiTitleWidget(text: 'Shafici Pharmaceutical POS', defaultText: true, medium: true,)
                         ],
                       ),
 
@@ -80,8 +80,8 @@ class LoginFormSectionWidget extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          UiTitleWidget(text: 'Branch:', medium: true,),
-                          UiTitleWidget(text: deviceData?.branchName ?? '---', medium: true,)
+                          UiTitleWidget(text: 'Branch name:',),
+                          UiTitleWidget(text: deviceData?.branchName ?? '---', )
                         ],
                       ),
 

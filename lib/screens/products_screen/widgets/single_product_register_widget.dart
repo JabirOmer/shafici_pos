@@ -132,6 +132,8 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
     _profitController.clear();
     _stockQtyController.clear();
     _alertQtyController.clear();
+    _batchNumberController.clear();
+    _brandController.clear();
     setState(() {
       _openCategoriesDropDown = false;
       _selectedCategory = null;
@@ -253,6 +255,8 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
   // _productFormKey.currentState?.dispose();
   _productNameController.dispose();
   _barcodeController.dispose();
+  _batchNumberController.dispose();
+  _brandController.dispose();
   _expireDateController.dispose();
   _usdCostController.dispose();
   _birrCostController.dispose();

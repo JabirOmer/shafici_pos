@@ -258,7 +258,7 @@ class _PosProductsDisplayWidgetState extends State<PosProductsDisplayWidget> {
               child: UiTextFieldWidget(
                 textController: _searchController, 
                 keyboardType: TextInputType.text,
-                label: 'search name or barcode',
+                label: 'search name, barcode or brand',
                 onChange: (value) => _handleSearch(value),
               ),
             ),
