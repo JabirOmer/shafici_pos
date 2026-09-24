@@ -80,6 +80,7 @@ class SalesProvider extends ChangeNotifier {
           switch (userRole) {
             case 'admin': filteredData = salesData;
             case 'cashier': filteredData = salesData.where((s) => s.cashierId == userData!.userId).toList();
+            case 'seller': filteredData = salesData.where((s) => s.sellerId == userData!.userId).toList();
             default: filteredData = [];
           }
 

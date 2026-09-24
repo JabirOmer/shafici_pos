@@ -117,14 +117,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final AppInfoProvider appInfoProvider = Provider.of(context, listen: false);
     setState(() => _isLoading = true);
 
+    setState(() => _showAppRevokePopup = !_showAppRevokePopup);
+
     try {
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
       final response = await _apiServices.patchRequest(url: CUrlStrings.deviceRevokeUrl, data: {}, authToken: deviceToken);
 
       switch (response.statusCode) {
-        // case 200: {
-        //   // _successMessage = response.data['msg'];
-        // }
         case 200: appInfoProvider.revokeDevice();
         default: _errorMessage = response.data;
       }

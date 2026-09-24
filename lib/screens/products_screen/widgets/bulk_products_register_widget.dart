@@ -429,13 +429,22 @@
 // //     } catch (e
 
 
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/icons.dart';
+import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/sizes.dart';
+import 'package:shafici_pos/constants/url_strings.dart';
+import 'package:shafici_pos/models/bulk_register_message_model.dart';
+import 'package:shafici_pos/providers/products_provider.dart';
 import 'package:shafici_pos/screens/products_screen/register_products_screen.dart';
+import 'package:shafici_pos/screens/products_screen/widgets/bulk_register_alert_widget.dart';
+import 'package:shafici_pos/services/api_services.dart';
+import 'package:shafici_pos/services/secure_store_services.dart';
 import 'package:shafici_pos/ui/ui_animated_mini_message_widget.dart';
 import 'package:shafici_pos/ui/ui_button_widget.dart';
 import 'package:shafici_pos/ui/ui_text_field_widget.dart';
@@ -458,6 +467,14 @@ class BulkProductsRegisterWidget extends StatefulWidget {
 }
 
 class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget> {
+  final _secureStorageService = CSecureStorageService();
+  final _apiServices = CApiServices();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  String? _successMessage;
+  BulkRegisterMessageModel? _bulkMessages;
+
   final TextEditingController _sheetNameController = TextEditingController();
   PlatformFile? _selectedFile;
   String? _fileStatus;
@@ -486,7 +503,7 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
 
       final file = await FilePicker.pickFile(
         type: FileType.custom,
-        allowedExtensions: [ 'xlsx', 'xls' ],
+        allowedExtensions: [ 'xlsx', 'xls', 'numbers' ],
       );
 
       setState(() {
@@ -505,7 +522,52 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
   }
 
   // -- -- --
-  Future<void> _handleSubmitClick() async {}
+  Future<void> _handleSubmitClick() async {
+    if (_isLoading || _selectedFile == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final FormData formData = FormData.fromMap({
+        'sheet_name': _sheetNameController.text.trim(),
+        'file': await MultipartFile.fromFile(
+          _selectedFile!.path!,
+          filename: _selectedFile!.name,
+        ),
+      });
+
+      final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
+      final response = await _apiServices.postRequest(url: CUrlStrings.registerBulkProductsUrl, data: {}, formData: formData, authToken: deviceToken);
+
+      switch (response.statusCode) {
+        case 201: {
+          _bulkMessages = BulkRegisterMessageModel.fromMap(response.data);
+          _successMessage = response.data['msg'];
+        }
+
+        default: _errorMessage = response.data;
+      }
+    } 
+    catch (e) {
+      print('Errors: $e');
+    }
+    finally {
+      setState(() => _isLoading = false);
+      await Future.delayed(Duration(milliseconds: 1500));
+
+      if (mounted) {
+        // _successMessage != null ? _handleBack() : setState(() => _errorMessage = null,);
+        setState(() => _errorMessage = null,);
+      }
+    }
+  }
+
+
+  void _handleBack() {
+    final provider = Provider.of<ProductsProvider>(context, listen: false);
+    provider.setProducts();
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -623,6 +685,26 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
                             isNeutral: true,
                           ),
 
+                          UiAnimatedMiniMessageWidget(
+                            displayText: _errorMessage,
+                            // isSuccess: _successMessage != null,
+                          ),
+
+                          if (_bulkMessages != null) Column(
+                            children: [
+                              SizedBox(height: CSizes.largeGap,),
+
+                              BulkRegisterAlertWidget(
+                                // info: BulkRegisterMessageModel(
+                                //   successfullImports: [], 
+                                //   dublicatedImports: [], 
+                                //   failedImports: ['Product 1: Invalid category name', 'Product 2: Invalid category name', 'Product 3: Product name is missing']
+                                // )
+                                info: _bulkMessages!,
+                              ),
+                            ],
+                          ),
+
                           SizedBox(height: CSizes.xLargeGap,),
 
                           Row(
@@ -631,7 +713,7 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
                                 child: UiButtonWidget(
                                   text: 'back',
                                   tranparent: true,
-                                  onClick: widget.onBackClick
+                                  onClick: _isLoading ? () {} : (_successMessage != null ? _handleBack : widget.onBackClick),
                                 ),
                               ),
 
@@ -639,10 +721,10 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
 
                               Expanded(
                                 child: UiButtonWidget(
-                                  icon: CIcons.sendIcon,
-                                  text: 'submit',
-                                  isDisabled: _selectedFile == null || _fileStatus != null,
-                                  onClick: _handleSubmitClick,
+                                  icon: _successMessage != null ? null : CIcons.sendIcon,
+                                  text: _successMessage != null ? 'done' : 'submit',
+                                  isDisabled: _selectedFile == null || _fileStatus != null || _isLoading,
+                                  onClick: _successMessage != null ? _handleBack : _handleSubmitClick,
                                 )
                               ),
                             ],

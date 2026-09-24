@@ -57,8 +57,6 @@ class AppInfoProvider extends ChangeNotifier {
         return;
       }
 
-      print('object 1');
-
       // decode device token
       _deviceData = await _decodeDeviceToken();
       notifyListeners();
@@ -68,13 +66,9 @@ class AppInfoProvider extends ChangeNotifier {
         return;
       }
 
-      print('object 2');
-
       // decode user token
       _currentUser = await _decodeJWT();
       notifyListeners();
-
-      print('object 3');
 
       _authStatusEnum = _currentUser == null ? AuthStatusEnum.login : AuthStatusEnum.home;
       notifyListeners();
@@ -107,24 +101,19 @@ class AppInfoProvider extends ChangeNotifier {
       // ensure token is not expired
       final isExpired = JwtDecoder.isExpired(token);
       if (isExpired) {
-        print('error 2');
         return null;
       }
      
       // decode token
       final Map<String, dynamic>? decodedToken = JwtDecoder.tryDecode(token);
       if (decodedToken == null) {
-        print('error 3');
         return null;
       }
-
-      print(decodedToken);
 
       // success
       final device = DeviceModel.fromMap(decodedToken);
       return device;
     } catch (e) {
-      print('error last: $e');
       return null;
     }
   }
