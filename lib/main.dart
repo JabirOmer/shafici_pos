@@ -48,12 +48,12 @@ void main() async {
 
 
   // - - - O P E N _ H I V E _ B O X E S
-  await Hive.openBox<ProductModel>(CHiveStrings.productsBox);
-  await Hive.openBox<ProductCategoryModel>(CHiveStrings.productCategoriesBox);
-  await Hive.openBox<OrderSessionModel>(CHiveStrings.orderSessionsBox);
-  await Hive.openBox<PaymentMethodModel>(CHiveStrings.paymentMethodsBox);
-  await Hive.openBox<UserModel>(CHiveStrings.usersBox);
-  await Hive.openBox<SaleDataModel>(CHiveStrings.offlineSalesBox);
+  await safeOpenBox<ProductModel>(CHiveStrings.productsBox);
+  await safeOpenBox<ProductCategoryModel>(CHiveStrings.productCategoriesBox);
+  await safeOpenBox<OrderSessionModel>(CHiveStrings.orderSessionsBox);
+  await safeOpenBox<PaymentMethodModel>(CHiveStrings.paymentMethodsBox);
+  await safeOpenBox<UserModel>(CHiveStrings.usersBox);
+  await safeOpenBox<SaleDataModel>(CHiveStrings.offlineSalesBox);
 
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.immersiveSticky, // hides status & nav bars
@@ -102,6 +102,17 @@ void main() async {
   // runApp(MaterialApp(
   //   home: Scaffold(),
   // ));
+
+
+Future<Box<T>> safeOpenBox<T>(String boxName) async {
+  try {
+    return await Hive.openBox<T>(boxName);
+  } catch (e) {
+    debugPrint('Hive box "$boxName" failed to open ($e) — resetting it.');
+    await Hive.deleteBoxFromDisk(boxName);
+    return await Hive.openBox<T>(boxName);
+  }
+}
 
 
 Future<void> _clearAllLocalData() async {
