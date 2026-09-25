@@ -34,9 +34,6 @@ void main() async {
   // - - - I N I T I A L I Z E _ S H A R E D _ P R E F E R E N C E S
   await CSharedPreferencesServices.init();
 
-  // // - - - F R E S H _ S T A R T
-  // await _clearAllLocalData();
-
   // - - - R E G I S T E R _ H I V E _ A D A P T E R S
   Hive.registerAdapter(ProductModelAdapter());
   Hive.registerAdapter(ProductCategoryModelAdapter());
@@ -100,11 +97,11 @@ void main() async {
       child: App(),
     )
   );
+}
 
   // runApp(MaterialApp(
   //   home: Scaffold(),
   // ));
-}
 
 
 Future<void> _clearAllLocalData() async {
