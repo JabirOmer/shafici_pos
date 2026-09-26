@@ -62,9 +62,11 @@ class MiniProductDetailsWidget extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                UiTitleWidget(
-                                  text: CHelperFunctions.capitalizeWords(product.productName),
-                                  bigger: true,
+                                Expanded(
+                                  child: UiTitleWidget(
+                                    text: CHelperFunctions.capitalizeWords(product.productName),
+                                    bigger: true,
+                                  ),
                                 ),
                                 SizedBox(width: CSizes.smallGap),
                                 if (!product.isTaxable) Image.asset(
