@@ -549,12 +549,13 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
       }
     } 
     catch (e) {
-      print('Errors: $e');
+      _errorMessage = 'Failed to send file';
     }
     finally {
       setState(() => _isLoading = false);
+      
       await Future.delayed(Duration(milliseconds: 1500));
-
+      
       if (mounted) {
         // _successMessage != null ? _handleBack() : setState(() => _errorMessage = null,);
         setState(() => _errorMessage = null,);
@@ -590,7 +591,7 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
                       borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
                     ),
                     padding: EdgeInsets.all(CSizes.largeGap),
-                    child: Form(
+                    child: _bulkMessages == null ? Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -690,24 +691,14 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
                             // isSuccess: _successMessage != null,
                           ),
 
-                          if (_bulkMessages != null) Column(
-                            children: [
-                              SizedBox(height: CSizes.largeGap,),
-
-                              BulkRegisterAlertWidget(
-                                // info: BulkRegisterMessageModel(
-                                //   successfullImports: [], 
-                                //   dublicatedImports: [], 
-                                //   failedImports: ['Product 1: Invalid category name', 'Product 2: Invalid category name', 'Product 3: Product name is missing']
-                                // )
-                                info: _bulkMessages!,
-                              ),
-                            ],
+                          if (_isLoading) UiAnimatedMiniMessageWidget(
+                            displayText: 'DO NOT CLOSE THIS PAGE',
+                            isNeutral: true,
                           ),
 
                           SizedBox(height: CSizes.xLargeGap,),
 
-                          Row(
+                          if (!_isLoading) Row(
                             children: [
                               Expanded(
                                 child: UiButtonWidget(
@@ -731,7 +722,29 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
                           )
                         ],
                       ),
-                    )
+                    ) : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        UiTitleWidget(
+                          text: 'Export is completed',
+                          bigger: true,
+                          textAlign: TextAlign.center,
+                        ),
+
+                        SizedBox(height: CSizes.largeGap,),
+
+                        BulkRegisterAlertWidget(
+                          info: _bulkMessages!,
+                        ),
+
+                        SizedBox(height: CSizes.largeGap,),
+
+                        UiButtonWidget(
+                          text: 'done',
+                          onClick: _handleBack,
+                        )
+                      ],
+                    ),
                   )
                 )
               )
