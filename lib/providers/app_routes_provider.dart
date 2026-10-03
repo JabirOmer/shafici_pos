@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shafici_pos/constants/icons.dart';
 import 'package:shafici_pos/models/app_route_model.dart';
 import 'package:shafici_pos/screens/categories_screen/categories_screen.dart';
+import 'package:shafici_pos/screens/credit_screens/credit_screen.dart';
 import 'package:shafici_pos/screens/point_of_sale/point_of_sale_screen.dart';
 import 'package:shafici_pos/screens/settings_screen/settings_screen.dart';
 import 'package:shafici_pos/screens/payments_screen/payments_screen.dart';
 import 'package:shafici_pos/screens/products_screen/products_screen.dart';
+import 'package:shafici_pos/screens/users_screen/customers_screen.dart';
 import 'package:shafici_pos/screens/users_screen/users_screen.dart';
 import 'package:shafici_pos/screens/sales_screen/sales_history_screen.dart';
 
@@ -24,6 +26,16 @@ class AppRoutesProvider extends ChangeNotifier {
       routeName: 'Sales history', 
       routeIcon: CIcons.clockIcon, 
       element: SalesHistoryScreen() 
+    ),
+    AppRouteModel(
+      routeName: 'Credit', 
+      routeIcon: CIcons.walletTime, 
+      element: CreditScreen()
+    ),
+    AppRouteModel(
+      routeName: 'Customers', 
+      routeIcon: CIcons.profileIcon, 
+      element: CustomersScreen()
     ),
     // AppRouteModel(
     //   routeName: 'Users', 

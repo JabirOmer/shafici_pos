@@ -43,7 +43,7 @@ class CApiServices {
       if (data is Map && (data['msg'] != null)) {
         message = data['msg'].toString();
       } else {
-        message = 'Request failed!';
+        message = 'This request has failed!';
       }
 
       return Response(
@@ -90,7 +90,7 @@ class CApiServices {
       if (data is Map && (data['msg'] != null)) {
         message = data['msg'].toString();
       } else {
-        message = 'Request failed!';
+        message = 'This request has failed!';
       }
 
       return Response(
@@ -135,7 +135,7 @@ class CApiServices {
       if (data is Map && (data['msg'] != null)) {
         message = data['msg'].toString();
       } else {
-        message = 'Request failed!';
+        message = 'This request has failed!';
       }
 
       return Response(

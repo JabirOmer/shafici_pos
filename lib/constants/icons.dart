@@ -74,4 +74,7 @@ class CIcons {
   static String location  = 'assets/icons/location-tick.svg';
   static String hashtag  = 'assets/icons/hashtag-1.svg';
   static String arrowRight  = 'assets/icons/arrow-right4.svg';
+
+
+  static String moreIconDots  = 'assets/icons/more.svg';
 }

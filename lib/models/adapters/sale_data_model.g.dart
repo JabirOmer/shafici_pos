@@ -27,13 +27,14 @@ class SaleDataModelAdapter extends TypeAdapter<SaleDataModel> {
       totalChange: fields[7] as double,
       createdAt: fields[8] as DateTime,
       receiptUrl: fields[9] as String?,
+      creditData: fields[10] as CreditModel?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleDataModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.sellerId)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class SaleDataModelAdapter extends TypeAdapter<SaleDataModel> {
       ..writeByte(8)
       ..write(obj.createdAt)
       ..writeByte(9)
-      ..write(obj.receiptUrl);
+      ..write(obj.receiptUrl)
+      ..writeByte(10)
+      ..write(obj.creditData);
   }
 
   @override

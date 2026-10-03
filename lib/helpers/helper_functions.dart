@@ -18,8 +18,13 @@ class CHelperFunctions {
 
   // - - - A V A I A L A B L E _ S C R E E N _ S P A C E
   static double availableScreenHeight({required BuildContext context}) {
+    // final screenHeight = MediaQuery.of(context).size.height;
     final screenHeight = MediaQuery.of(context).size.height;
-    return screenHeight;
+    final appBarHeight = 0;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    print('Height: $appBarHeight');
+    return screenHeight - appBarHeight - topPadding - bottomPadding;
   }
 
 
@@ -80,6 +85,20 @@ class CHelperFunctions {
     if (stock <= 0) return CColors.red.withValues(alpha: 0.3);
     if (stock <= alertQuantity) return CColors.deepOrange.withValues(alpha: 0.3);
     return CColors.green.withValues(alpha: 0.3);
+  }
+
+
+
+  // -- -- --
+  static String shortenId(String id) {
+    if (id.isEmpty) return id;
+    final seperated = id.split('-').toList();
+    
+    List<String> list = seperated.map((section) {
+      return section.substring(1, 4);
+    }).toList();
+
+    return list.length >= 4 ? '${list[0]}-${list[1]}${list[2]}-${list.last}' : list.first;
   }
 }
   // void getStockStatus() {

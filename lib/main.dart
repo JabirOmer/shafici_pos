@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shafici_pos/app.dart';
+import 'package:shafici_pos/blocs/cubits/credit_cubit.dart';
+import 'package:shafici_pos/blocs/cubits/customer_cubit.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/hive_strings.dart';
 import 'package:shafici_pos/models/order_calculation_model.dart';
@@ -94,7 +97,14 @@ void main() async {
           appInfoProvider: context.read<AppInfoProvider>()
         )),
       ],
-      child: App(),
+      // child: App(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (c) => CreditCubit(appInfoProvider: c.read<AppInfoProvider>())),
+          BlocProvider(create: (c) => CustomerCubit(appInfoProvider: c.read<AppInfoProvider>()))
+        ], 
+        child: App()
+      ),
     )
   );
 }

@@ -4,14 +4,18 @@ import 'package:shafici_pos/app.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/icons.dart';
 import 'package:shafici_pos/constants/secure_strings.dart';
+import 'package:shafici_pos/constants/shadows.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
+import 'package:shafici_pos/models/credit_model.dart';
+import 'package:shafici_pos/models/customer_model.dart';
 import 'package:shafici_pos/models/order_calculation_model.dart';
 import 'package:shafici_pos/models/order_data_model.dart';
 import 'package:shafici_pos/models/order_item_model.dart';
 import 'package:shafici_pos/models/order_payment_model.dart';
 import 'package:shafici_pos/models/payment_method_model.dart';
+import 'package:shafici_pos/models/adapters/register_credit_model.dart';
 import 'package:shafici_pos/models/sale_data_model.dart';
 import 'package:shafici_pos/models/user_model.dart';
 import 'package:shafici_pos/models/web_socket_message_model.dart';
@@ -19,6 +23,7 @@ import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/providers/products_provider.dart';
 import 'package:shafici_pos/providers/sales_provider.dart';
 import 'package:shafici_pos/providers/web_socket_server_provider.dart';
+import 'package:shafici_pos/screens/credit_screens/create_credit_widget.dart';
 import 'package:shafici_pos/screens/order_screens/widgets/pos_add_payment_popup.dart';
 import 'package:shafici_pos/screens/order_screens/widgets/pos_payment_list_display_widget.dart';
 import 'package:shafici_pos/services/api_services.dart';
@@ -45,7 +50,10 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
 
   double _amountPaid = 0;
   final List<OrderPaymentModel> _paymentList = [];
+  RegisterCreditModel? _creditData;
+
   bool _showPaymentPopup = false;
+  bool _showCreditPopup = false;
   
   // bool _isLoading = false;
   // String? _errorMessage;
@@ -62,14 +70,10 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
     setState(() => _showPaymentPopup = !_showPaymentPopup);
   }
 
-  
-  // // -- -- --
-  // void _clearMessages() {
-  //   setState(() {
-  //     _errorMessage = null;
-  //     _successMessage = null;
-  //   });
-  // }
+  // -- -- --
+  void _toggleShowCreditPopup() {
+    setState(() => _showCreditPopup = !_showCreditPopup);
+  }
 
   
   // -- -- --
@@ -81,17 +85,33 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
 
 
   // -- -- --
+  void _handleAddCredit(CustomerModel customer, double amount) {
+    setState(() => _creditData = RegisterCreditModel(customer: customer, amount: amount));
+    _toggleShowCreditPopup();
+    _calculateAmountPaid();
+  }
+
+
+  // -- -- --
   void _removePayment(int index) {
     setState(() => _paymentList.removeAt(index));
+    _calculateAmountPaid();
+  }
+
+  // -- -- --
+  void _deleteCredit() {
+    setState(() => _creditData = null);
     _calculateAmountPaid();
   }
 
   
   // -- -- --
   void _calculateAmountPaid() {
-    double total = 0;
-    for (var payment in _paymentList) { total += payment.paidAmount; }
-    setState(() => _amountPaid = total,);
+    double totalPayments = 0;
+    for (var payment in _paymentList) { totalPayments += payment.paidAmount; }
+    double totalCredit = _creditData?.amount ?? 0;
+
+    setState(() => _amountPaid = (totalPayments + totalCredit),);
   }
 
   
@@ -101,19 +121,40 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
 
     final double change = _amountPaid > calculation.grandTotal ? _amountPaid - calculation.grandTotal : 0;
 
+    // - - - O R D E R _ D A T A ( F O R _ A P I )
     final order = OrderDataModel(
-      sellerId: _userData.userId, cashierId: _userData.userId, customerId: null, 
-      items: items, orderCalculation: calculation, 
-      orderPayments: _paymentList, totalChange: change,
-      createdAt: DateTime.now()
+      sellerId: _userData.userId, 
+      cashierId: _userData.userId, 
+      customerId: null, 
+      items: items, 
+      orderCalculation: calculation, 
+      orderPayments: _paymentList, 
+      totalChange: change,
+      createdAt: DateTime.now(),
+      creditData: _creditData
     );
 
+    
+    // - - - F O R _ O F F L I N E _ D I S P L A Y
     final saleData = SaleDataModel(
-      sellerId: _userData.userId, sellerName: '${_userData.firstName} ${_userData.middleName}', 
-      cashierId: _userData.userId, cashierName: '${_userData.firstName} ${_userData.middleName}', 
-      items: items, orderCalculation: calculation, 
-      orderPayments: _paymentList, totalChange: change, 
-      createdAt: DateTime.now()
+      sellerId: _userData.userId, 
+      sellerName: '${_userData.firstName} ${_userData.middleName}', 
+      cashierId: _userData.userId, 
+      cashierName: '${_userData.firstName} ${_userData.middleName}', 
+      items: items, 
+      orderCalculation: calculation, 
+      orderPayments: _paymentList, 
+      totalChange: change, 
+      createdAt: DateTime.now(),
+      creditData: _creditData == null ? null : CreditModel(
+        branchId: 'this branch', 
+        creditId: 'unknown', 
+        totalAmount: _creditData!.amount, 
+        customer: _creditData!.customer, 
+        creditStatus: 'pending', 
+        records: [], 
+        createdAt: DateTime.now()
+      )
     );
 
     await salesProvider.sendOrder(order, saleData: saleData);
@@ -156,6 +197,7 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
       builder: (context, productProvider, saleProvider, child) {
         return Stack(
           children: [
+
             Scaffold(
               appBar: AppBar(
                 title: UiTitleWidget(text: 'order payment'),
@@ -217,58 +259,149 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
                   
                   
                   // - - - N O _ P A Y M E N T S
-                  Stack(
-                    children: [
-                      
-                    ],
-                  ),
-                  if (_paymentList.isEmpty) Expanded(
-                    child: UiNoDataFounded(
-                      title: 'no payment is registered',
-                      buttonText: 'add payment',
-                      onButtonClick: _toggleShowPaymentPopup,
-                    ),
-                  ),
-              
-              
-                  // - - - P A Y M E N T _ L I S T
-                  if (_paymentList.isNotEmpty) Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(CSizes.largeGap),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        
+                        // if (_paymentList.isEmpty) Center(
+                        //   child: UiNoDataFounded(
+                        //     title: 'no payment is registered',
+                        //     buttonText: 'add payment',
+                        //     onButtonClick: _toggleShowPaymentPopup,
+                        //   ),
+                        // ),
+
+
+                        // - - - P A Y M E N T _ L I S T
+                        Padding(
+                          padding: EdgeInsets.all(CSizes.largeGap),
+                          child: Column(
                             children: [
-                              UiButtonWidget(
-                                icon: CIcons.walletAdd,
-                                text: 'add payment',
-                                vericalPadding: CSizes.smallGap,
-                                onClick: _toggleShowPaymentPopup
-                              )
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  UiButtonWidget(
+                                    icon: CIcons.walletAdd,
+                                    text: 'credit',
+                                    tranparent: true,
+                                    vericalPadding: CSizes.smallGap,
+                                    onClick: _toggleShowCreditPopup
+                                  ),
+
+                                  SizedBox(width: CSizes.mediumGap,),
+
+                                  UiButtonWidget(
+                                    icon: CIcons.walletAdd,
+                                    text: 'add payment',
+                                    vericalPadding: CSizes.smallGap,
+                                    onClick: _toggleShowPaymentPopup
+                                  )
+                                ],
+                              ),
+                                                
+                              SizedBox(height: CSizes.largeGap,),
+
+                              if (_creditData != null) Container(
+                                decoration: BoxDecoration(
+                                  color: CColors.deepPurple,
+                                  borderRadius: BorderRadius.circular(CSizes.xLargeGap),
+                                  boxShadow: CShadows.shadow1,
+                                ),
+                                padding: EdgeInsets.all(CSizes.mediumGap),
+                                margin: EdgeInsets.only(bottom: CSizes.largeGap),
+                                child: Row(
+                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              color: CColors.white,
+                                              borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
+                                            ),
+                                            padding: EdgeInsets.symmetric(horizontal: CSizes.mediumGap),
+                                            margin: EdgeInsets.only( right: CSizes.mediumGap ),
+                                            child: Center(
+                                              child: UiTitleWidget(
+                                                text: 'Credit',
+                                                bold: false,
+                                                textAlign: TextAlign.center,
+                                                // color: CColors.whiteShade2,
+                                              ),
+                                            ),
+                                          ),
+
+                                          UiTitleWidget(
+                                            text: _creditData!.customer.customerName,
+                                            color: CColors.white,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    UiTitleWidget(
+                                        text: '  ${CHelperFunctions.formatNumberWithComma(_creditData!.amount)} Birr  ',
+                                        defaultText: true,
+                                        color: CColors.white,
+                                        medium: true,
+                                      ),
+                              
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          UiButtonWidget(
+                                            icon: CIcons.trashIcon,
+                                            vericalPadding: CSizes.smallGap,
+                                            horizontalPadding: CSizes.smallGap,
+                                            backgroundColor: CColors.red,
+                                            onClick: _deleteCredit
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Expanded(
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) => PosPaymentListDisplayWidget(
+                                    index: index, 
+                                    payment: _paymentList[index], 
+                                    onDeleteClick: () => _removePayment(index)
+                                  ), 
+                                  separatorBuilder: (context, index) => SizedBox(height: CSizes.mediumGap,), 
+                                  itemCount: _paymentList.length
+                                ),
+                              ),
+                        
                             ],
                           ),
-                  
-                          SizedBox(height: CSizes.largeGap,),
+                        ),
 
-                          Expanded(
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              physics: AlwaysScrollableScrollPhysics(),
-                              itemBuilder: (context, index) => PosPaymentListDisplayWidget(
-                                index: index, 
-                                payment: _paymentList[index], 
-                                onDeleteClick: () => _removePayment(index)
-                              ), 
-                              separatorBuilder: (context, index) => SizedBox(height: CSizes.mediumGap,), 
-                              itemCount: _paymentList.length
-                            ),
-                          )
 
-                        ],
-                      ),
+                        // - - - A D D _ P A Y M E N T _ P O P U P
+                        if (_showPaymentPopup) PosAddPaymentPopup(
+                          onCloseClick: _toggleShowPaymentPopup, 
+                          // onSubmitClick: (paymentMethod, amount) => _handleNewPayment(paymentMethod, amount),
+                          onSubmitClick: (payment) => _handleNewPayment(payment),
+                        ),
+
+
+                        // - - - A D D _ C R E D I T _ P O P U P
+                        if (_showCreditPopup) CreateCreditWidget(
+                          onCancel: _toggleShowCreditPopup,
+                          onSubmit: (customer, amount) => _handleAddCredit(customer, amount), 
+                        ),
+
+                      ],
                     ),
-                  )
+                  ),
               
                 ],
               ),
@@ -276,15 +409,15 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
     
     
     
-            // - - - A D D _ P A Y M E N T _ P O P U P
-            if (_showPaymentPopup) Scaffold(
-              backgroundColor: CColors.transparent,
-              body: PosAddPaymentPopup(
-                onCloseClick: _toggleShowPaymentPopup, 
-                // onSubmitClick: (paymentMethod, amount) => _handleNewPayment(paymentMethod, amount),
-                onSubmitClick: (payment) => _handleNewPayment(payment),
-              ),
-            ),
+            // // - - - A D D _ P A Y M E N T _ P O P U P
+            // if (_showPaymentPopup) Scaffold(
+            //   backgroundColor: CColors.transparent,
+            //   body: PosAddPaymentPopup(
+            //     onCloseClick: _toggleShowPaymentPopup, 
+            //     // onSubmitClick: (paymentMethod, amount) => _handleNewPayment(paymentMethod, amount),
+            //     onSubmitClick: (payment) => _handleNewPayment(payment),
+            //   ),
+            // ),
     
     
     
@@ -301,7 +434,7 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
                 outSideClick: _goBack
               ),
             ),
-    
+            
     
     
     

@@ -8,6 +8,7 @@ import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
 import 'package:shafici_pos/models/order_data_model.dart';
 import 'package:shafici_pos/models/payment_method_model.dart';
+import 'package:shafici_pos/models/adapters/register_credit_model.dart';
 import 'package:shafici_pos/models/sale_data_model.dart';
 import 'package:shafici_pos/models/user_model.dart';
 import 'package:shafici_pos/providers/app_info_provider.dart';
@@ -86,11 +87,14 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
   Future<void> _handleOrderResend(SaleDataModel sale) async {
     final SalesProvider salesProvider = Provider.of(context, listen: false);
 
+    final credit = sale.creditData == null ? null : RegisterCreditModel(customer: sale.creditData!.customer, amount: sale.creditData!.totalAmount);
+
     final order = OrderDataModel(
       sellerId: sale.sellerId, cashierId: sale.cashierId, customerId: null, 
       items: sale.items, orderCalculation: sale.orderCalculation, 
       orderPayments: sale.orderPayments, totalChange: sale.totalChange,
-      createdAt: sale.createdAt
+      createdAt: sale.createdAt,
+      creditData: credit
     );
 
     await salesProvider.sendOrder(order, resend: true, saleData: sale);

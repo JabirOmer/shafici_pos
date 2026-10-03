@@ -64,7 +64,7 @@ class LoginFormSectionWidget extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
+                          Image.asset (
                             'assets/images/shafici-icon.png',
                             height: 40,
                           ),

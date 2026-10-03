@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/icons.dart';
+import 'package:shafici_pos/constants/shadows.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
 import 'package:shafici_pos/models/order_payment_model.dart';
@@ -24,7 +25,8 @@ class PosPaymentListDisplayWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: CColors.white,
-        borderRadius: BorderRadius.circular(CSizes.smallGap)
+        borderRadius: BorderRadius.circular(CSizes.xLargeGap),
+        border: Border.all(width: 1, color: CColors.whiteShade2)
       ),
       padding: EdgeInsets.all(CSizes.mediumGap),
       child: Row(
@@ -35,16 +37,19 @@ class PosPaymentListDisplayWidget extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 25,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: CColors.whiteShade2,
                     borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
                   ),
-                  child: UiTitleWidget(
-                    text: (index+1).toString().padLeft(2, '0'),
-                    bold: false,
-                    textAlign: TextAlign.center,
-                    // color: CColors.whiteShade2,
+                  child: Center(
+                    child: UiTitleWidget(
+                      text: (index+1).toString().padLeft(2, '0'),
+                      bold: false,
+                      textAlign: TextAlign.center,
+                      // color: CColors.whiteShade2,
+                    ),
                   ),
                 ),
 

@@ -3,6 +3,7 @@ import 'package:shafici_pos/constants/hive_type_ids.dart';
 import 'package:shafici_pos/models/order_calculation_model.dart';
 import 'package:shafici_pos/models/order_item_model.dart';
 import 'package:shafici_pos/models/order_payment_model.dart';
+import 'package:shafici_pos/models/adapters/register_credit_model.dart';
 
 
 part 'adapters/order_data_model.g.dart';
@@ -34,6 +35,9 @@ class OrderDataModel extends HiveObject {
   @HiveField(7)
   final DateTime createdAt;
 
+  @HiveField(8)
+  final RegisterCreditModel? creditData;
+
 
   OrderDataModel({
     required this.sellerId,
@@ -44,21 +48,23 @@ class OrderDataModel extends HiveObject {
     required this.orderPayments,
     required this.totalChange,
     required this.createdAt,
+    required this.creditData,
   });
 
 
-  factory OrderDataModel.fromMap(Map<String, dynamic> orderData) {
-    return OrderDataModel( 
-      sellerId: orderData['seller_id'],
-      cashierId: orderData['cashier_id'],
-      customerId: orderData['customer_id'],
-      items: (orderData['order_items'] as List<dynamic>? ?? []).map((item) => OrderItemModel.fromMap(item)).toList(),
-      orderCalculation: OrderCalculationModel.fromMap(orderData['order_calculation']),
-      orderPayments: (orderData['order_payments'] as List<dynamic>).map((payment) => OrderPaymentModel.fromMap(payment)).toList(),
-      totalChange: double.parse(orderData['total_change']),
-      createdAt: DateTime.parse(orderData['created_at']).toLocal(),
-    );
-  }
+  // factory OrderDataModel.fromMap(Map<String, dynamic> orderData) {
+  //   return OrderDataModel( 
+  //     sellerId: orderData['seller_id'],
+  //     cashierId: orderData['cashier_id'],
+  //     customerId: orderData['customer_id'],
+  //     items: (orderData['order_items'] as List<dynamic>? ?? []).map((item) => OrderItemModel.fromMap(item)).toList(),
+  //     orderCalculation: OrderCalculationModel.fromMap(orderData['order_calculation']),
+  //     orderPayments: (orderData['order_payments'] as List<dynamic>).map((payment) => OrderPaymentModel.fromMap(payment)).toList(),
+  //     totalChange: double.parse(orderData['total_change']),
+  //     createdAt: DateTime.parse(orderData['created_at']).toLocal(),
+  //     creditData: null
+  //   );
+  // }
 
 
   Map<String, dynamic> toJson() {
@@ -71,6 +77,7 @@ class OrderDataModel extends HiveObject {
       'order_payments': orderPayments.map((payment) => payment.toJson()).toList(),
       'total_change': totalChange,
       'created_at': createdAt.toUtc().toIso8601String(),
+      'credit_data': creditData?.toJson()
     };
   }
 }

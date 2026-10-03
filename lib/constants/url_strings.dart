@@ -3,6 +3,7 @@ class CUrlStrings {
 
   
   static String baseUrl = 'http://localhost:4040';
+  // static String baseUrl = 'https://mizanserver.saqrinnovations.com';
   // static String baseUrl = 'https://wasl-pos-server-7alsz.ondigitalocean.app';
   // static String baseUrl = 'https://wasl-server-snvsj.ondigitalocean.app';
 
@@ -49,4 +50,15 @@ class CUrlStrings {
   // - - - Sales / Order
   static String sendOrderUrl = '$baseUrl/sales/register';
   static String getSalesUrl = '$baseUrl/sales/history';
+
+
+  // - - - C U S T O M E R S
+  static String getCustomers = '$baseUrl/customers';
+  static String registerCustomer = '$baseUrl/customers/register';
+
+  // - - - C R E D I T S
+  static String getBranchCredits = '$baseUrl/credits/by-branch/'; // add branch id as a params
+
+  // - - - C R E D I T S _ R E C O R D S
+  static String registerCreditRecord = '$baseUrl/credits/register-record'; // add branch id as a params
 }

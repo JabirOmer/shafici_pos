@@ -1,5 +1,6 @@
 import 'package:hive_flutter/adapters.dart';
 import 'package:shafici_pos/constants/hive_type_ids.dart';
+import 'package:shafici_pos/models/credit_model.dart';
 import 'package:shafici_pos/models/order_calculation_model.dart';
 import 'package:shafici_pos/models/order_item_model.dart';
 import 'package:shafici_pos/models/order_payment_model.dart';
@@ -40,6 +41,9 @@ class SaleDataModel {
   
   @HiveField(9)
   final String? receiptUrl;
+  
+  @HiveField(10)
+  final CreditModel? creditData;
 
   SaleDataModel({
     required this.sellerId,
@@ -52,6 +56,7 @@ class SaleDataModel {
     required this.totalChange,
     required this.createdAt,
     this.receiptUrl,
+    required this.creditData
   });
 
 
@@ -66,7 +71,9 @@ class SaleDataModel {
       orderPayments: (sale['order_payments'] as List<dynamic>).map((payment) => OrderPaymentModel.fromMap(payment)).toList(),
       totalChange: double.parse(sale['total_change']),
       createdAt: DateTime.parse(sale['created_at']).toLocal(),
-      receiptUrl: sale['receipt_url']
+      receiptUrl: sale['receipt_url'],
+      // creditData: CreditModel.fromMap(sale['credit_data']) 
+      creditData: null
     );
   }
 }

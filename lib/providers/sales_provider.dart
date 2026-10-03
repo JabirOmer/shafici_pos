@@ -93,6 +93,7 @@ class SalesProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
+      if (kDebugMode) print('Failed to get sales data: $e');
       _errorMessage = 'Failed to get sales data';
     } finally {
       _isLoading = false;

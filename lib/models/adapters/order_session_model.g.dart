@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'order_session_model.dart';
+part of '../order_session_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

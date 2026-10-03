@@ -2,7 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shafici_pos/constants/hive_type_ids.dart';
 import 'package:shafici_pos/models/order_item_model.dart';
 
-part 'order_session_model.g.dart';
+part 'adapters/order_session_model.g.dart';
 const typeId = CHiveTypeIds.orderSessionTypeId;
 @HiveType(typeId: typeId)
 

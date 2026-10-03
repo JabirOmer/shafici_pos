@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shafici_pos/constants/animations.dart';
 import 'package:shafici_pos/constants/colors.dart';
+import 'package:shafici_pos/constants/shadows.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/ui/ui_button_widget.dart';
 import 'package:shafici_pos/ui/ui_title_widget.dart';
@@ -12,9 +13,13 @@ class UiNoDataFounded extends StatelessWidget {
   final bool noRepeat;
   final String? noDataAnimation;
   final double? iconHeight;
-  final String? buttonText;
   final Color? backgroundColor;
+  
+  final String? buttonText;
   final void Function()? onButtonClick;
+
+  final String? secondaryText;
+  final void Function()? onSecondaryBtnClick;
 
   const UiNoDataFounded({
     super.key,
@@ -23,9 +28,13 @@ class UiNoDataFounded extends StatelessWidget {
     this.noRepeat = false,
     this.noDataAnimation,
     this.iconHeight,
+    this.backgroundColor,
+
     this.buttonText,
     this.onButtonClick,
-    this.backgroundColor,
+
+    this.secondaryText,
+    this.onSecondaryBtnClick
   });
 
   @override
@@ -38,13 +47,16 @@ class UiNoDataFounded extends StatelessWidget {
             maxWidth: 600
           ),
           child: Padding(
-            padding: EdgeInsets.all(CSizes.xLargeGap),
+            padding: EdgeInsets.all(0),
             child: Container(
               width: double.maxFinite,
               decoration: BoxDecoration(
                 color: backgroundColor ?? CColors.white,
+                boxShadow: CShadows.shadow1,
+                border: Border.all(width: 1, color: CColors.whiteShade2),
                 borderRadius: BorderRadius.circular(CSizes.smallRadius + 20),
               ),
+              margin: EdgeInsets.all(CSizes.largeGap),
               padding: EdgeInsets.symmetric(
                 horizontal: CSizes.xLargeGap,
                 vertical: CSizes.xLargeGap
@@ -77,9 +89,28 @@ class UiNoDataFounded extends StatelessWidget {
                     children: [
                       SizedBox(height: CSizes.largeGap,),
             
-                      UiButtonWidget(
-                        text: buttonText ?? 'try again',
-                        onClick: onButtonClick!,
+                      Row(
+                        children: [
+
+                          if (onSecondaryBtnClick != null) Expanded(
+                            child: Container(
+                              margin: EdgeInsets.only(right: CSizes.mediumGap),
+                              child: UiButtonWidget(
+                                tranparent: true,
+                                text: secondaryText ?? 'cancel',
+                                onClick: onSecondaryBtnClick!,
+                              ),
+                            ),
+                          ),
+
+                          Expanded(
+                            child: UiButtonWidget(
+                              text: buttonText ?? 'search again',
+                              onClick: onButtonClick!,
+                            ),
+                          ),
+
+                        ],
                       )
                     ],
                   )

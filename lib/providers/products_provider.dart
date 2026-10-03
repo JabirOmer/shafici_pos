@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:shafici_pos/constants/hive_strings.dart';
@@ -91,7 +92,9 @@ class ProductsProvider extends ChangeNotifier {
   Future<void> _fetchProducts() async {
     try {
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
+      print('gettings products');
       final resposne = await _apiServices.getRequest(url: CUrlStrings.getProductsUrl, authToken: deviceToken);
+      print('products got: ${resposne.statusCode}');
 
       switch (resposne.statusCode) {
         case 200: {
@@ -102,6 +105,9 @@ class ProductsProvider extends ChangeNotifier {
           await _reAssignOrderSession();
         }
       }
+    }
+    catch (e) {
+      if (kDebugMode) print('Failed to get products: $e');
     }
     finally {
       _productList.clear();

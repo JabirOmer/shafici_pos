@@ -35,7 +35,7 @@ class CColors {
   static Color purpleShade2 = Color(0xFFE0AAFF);
 
   static Color transparent = Color.fromARGB(0, 255, 255, 255);
-  static Color dimmedBackgound = Color.fromARGB(150, 0, 0, 0);
+  static Color dimmedBackgound = Color.fromRGBO(0, 0, 0, 0.2);
 
   static Color deepOrange = Color(0xFFfb8b24);
   static Color red = Color(0xFFC1121F);
