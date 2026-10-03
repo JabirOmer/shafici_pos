@@ -153,6 +153,7 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
         customer: _creditData!.customer, 
         creditStatus: 'pending', 
         records: [], 
+        items: [],
         createdAt: DateTime.now()
       )
     );

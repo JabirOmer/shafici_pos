@@ -100,7 +100,7 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
                 
                     Center(
                       child: ConstrainedBox(
-                        constraints: BoxConstraints( maxWidth: 600 ),
+                        constraints: BoxConstraints( maxWidth: 800 ),
                         child: Container(
                           decoration: BoxDecoration(
                             color: CColors.white,
@@ -238,6 +238,46 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
                               SizedBox(height: CSizes.largeGap,),
 
                               UiTitleWidget(
+                                text: 'Items',
+                                bigger: true,
+                              ),
+
+                              SizedBox(height: CSizes.mediumGap,),
+
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: widget.credit.items.length,
+                                itemBuilder: (context, index) {
+                                  final item = widget.credit.items[index];
+                                  return Container(
+                                    padding: EdgeInsets.symmetric(vertical: CSizes.mediumGap),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              UiTitleWidget( text: (index+1).toString().padLeft(2, '0') ),
+                                              SizedBox(width: CSizes.smallGap,),
+                                              UiTitleWidget( text: item.productName ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        SizedBox(width: CSizes.mediumGap,),
+
+                                        UiTitleWidget( text: '${(item.quantity).toString().padLeft(2, '0')} * ' ),
+                                        UiTitleWidget( text: '${CHelperFunctions.formatNumberWithComma(item.unitSoldAt)} Birr', defaultText: true, ),
+
+                                        
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              SizedBox(height: CSizes.largeGap,),
+
+                              UiTitleWidget(
                                 text: 'Records',
                                 bigger: true,
                               ),
@@ -364,20 +404,22 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
             ),
           ),
 
-          Row(
-            children: [
-              UiTitleWidget(text: CHelperFunctions.formatDateTime(record.createdAt), defaultText: true, bold: false,),
-              SizedBox(width: CSizes.mediumGap,),
-              UiButtonWidget(
-                icon: CIcons.trashIcon,
-                vericalPadding: CSizes.smallGap,
-                horizontalPadding: CSizes.smallGap,
-                backgroundColor: CColors.redDimmed,
-                color: CColors.red,
-                onClick: () => _handleDeleteRecord(record.recordId)
-              )
-            ],
-          )
+          UiTitleWidget(text: record.paymentName, capitalizeWords: true, bold: false,)
+
+          // Row(
+          //   children: [
+          //     UiTitleWidget(text: CHelperFunctions.formatDateTime(record.createdAt), defaultText: true, bold: false,),
+          //     SizedBox(width: CSizes.mediumGap,),
+          //     UiButtonWidget(
+          //       icon: CIcons.trashIcon,
+          //       vericalPadding: CSizes.smallGap,
+          //       horizontalPadding: CSizes.smallGap,
+          //       backgroundColor: CColors.redDimmed,
+          //       color: CColors.red,
+          //       onClick: () => _handleDeleteRecord(record.recordId)
+          //     )
+          //   ],
+          // )
 
         ],
       ),

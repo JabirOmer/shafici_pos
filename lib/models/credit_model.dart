@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:shafici_pos/models/credit_item_model.dart';
 import 'package:shafici_pos/models/credit_record_model.dart';
 import 'package:shafici_pos/models/customer_model.dart';
+import 'package:shafici_pos/models/order_item_model.dart';
 
 class CreditModel {
   final String branchId;
@@ -8,6 +10,7 @@ class CreditModel {
   final double totalAmount;
   final CustomerModel customer;
   final String creditStatus;
+  final List<CreditItemModel> items;
   final List<CreditRecordModel> records;
   final DateTime createdAt;
 
@@ -18,6 +21,7 @@ class CreditModel {
     required this.totalAmount,
     required this.customer,
     required this.creditStatus,
+    required this.items,
     required this.records,
     required this.createdAt,
   });
@@ -30,6 +34,8 @@ class CreditModel {
     customer: CustomerModel.fromMap(credit['customer'] as Map<String, dynamic>), 
       creditStatus: credit['credit_status'], 
       totalAmount: double.parse(credit['total_amount']), 
+      items: (credit['items'] as List<dynamic>).map((item) => CreditItemModel.fromMap(item)).toList(), 
+      // items: [],
       records: (credit['records'] as List<dynamic>).map((record) => CreditRecordModel.fromMap(record)).toList(), 
       createdAt: DateTime.parse(credit['created_at']).toLocal()
     );

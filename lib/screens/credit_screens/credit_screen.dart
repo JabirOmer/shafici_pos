@@ -255,16 +255,16 @@ class _CreditScreenState extends State<CreditScreen> {
                       onClick: onClick
                     ),
 
-                    SizedBox(width: CSizes.mediumGap,),
+                    // SizedBox(width: CSizes.mediumGap,),
 
-                    UiButtonWidget(
-                      // icon: CIcons.location,
-                      text: 'invoice',
-                      vericalPadding: CSizes.smallGap,
-                      horizontalPadding: CSizes.largeGap,
-                      tranparent: true,
-                      onClick: onDownloadClick
-                    ),
+                    // UiButtonWidget(
+                    //   // icon: CIcons.location,
+                    //   text: 'invoice',
+                    //   vericalPadding: CSizes.smallGap,
+                    //   horizontalPadding: CSizes.largeGap,
+                    //   tranparent: true,
+                    //   onClick: onDownloadClick
+                    // ),
                 
                   ],
                 ),

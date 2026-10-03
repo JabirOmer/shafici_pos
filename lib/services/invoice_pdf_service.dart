@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
 import 'package:shafici_pos/models/credit_model.dart';
@@ -19,9 +20,10 @@ class CInvoicePdfService {
     final name = '${customer}_invoice.pdf';
 
     pdf.addPage(MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      // margin: EdgeInsets.all(15),
       build: (context) => [
-        // _buildTitle(credit),
-        Text('text')
+        _buildTitle(credit),
 
         // the rest of the data
       ],
@@ -29,7 +31,6 @@ class CInvoicePdfService {
 
     return CPdfService.saveDocument(name: name, pdf: pdf);
   }
-}
 
 
 
@@ -41,45 +42,68 @@ class CInvoicePdfService {
 
 
 
-// 
-Widget _buildTitle(CreditModel credit) => Column(
-  crossAxisAlignment: CrossAxisAlignment.stretch,
-  children: [
-    
-    Text(
-      'INVOICE',
-      style: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.bold
+  // 
+  static Widget _buildTitle(CreditModel credit) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      
+      Text(
+        'INVOICE',
+        style: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold
+        )
+      ),
+      SizedBox(height: 0.2 * PdfPageFormat.cm),
+      Text(CHelperFunctions.shortenId(credit.creditId)),
+
+      SizedBox(height: 0.8 * PdfPageFormat.cm),
+
+      Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('ISSUED TO:', style: TextStyle( fontWeight: FontWeight.bold )),
+                SizedBox(height: 0.2 * PdfPageFormat.cm),
+                Text(CHelperFunctions.capitalizeWords(credit.customer.customerName)),
+                Text(credit.customer.phoneNumber),
+              ]
+            )
+          ),
+
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('VOUCHER NO', style: TextStyle( fontWeight: FontWeight.bold )),
+                
+                SizedBox(height: 0.2 * PdfPageFormat.cm),
+                Text('Date: ${CHelperFunctions.formatDateTime(credit.createdAt)}'),
+              ]
+            )
+          ),
+        ]
       )
-    ),
 
-    // SizedBox()
-
-    Row(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              Text('ISSUED TO', style: TextStyle(  )),
-              // Text(credit.customer.customerName),
-              // Text(credit.customer.phoneNumber),
-            ]
-          )
-        ),
+    ]
+  );
 
 
-        Expanded(
-          child: Column(
-            children: [
-              Text('INVOICE NO', style: TextStyle(  )),
-              // Text(CHelperFunctions.shortenId(credit.creditId)),
-              // Text(CHelperFunctions.formatDateTime(credit.createdAt)),
-            ]
-          )
-        ),
-      ]
-    )
 
-  ]
-);
+
+  // 
+  // static Widget _itemsList(CreditModel credit) {
+  //   final headers = {
+  //     index
+  //   }
+
+  //   return TableHelper.fromTextArray(
+  //     headers: ,
+  //     data: data
+  //   );
+  // }
+
+}
