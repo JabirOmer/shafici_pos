@@ -137,8 +137,14 @@ class ProductDetailsDisplayWidget extends StatelessWidget {
                               title: 'expire date :',
                               value: product.expireDate == null ? '- - -' : CHelperFunctions.formatDateTime(product.expireDate!),
                               defaultValue: true,
-                              addBorder: false
                             ),
+                          ),
+
+                          // - - - Product Id
+                          _productInfoTile(
+                            title: 'product id :',
+                            value: product.productId,
+                            addBorder: false
                           ),
                         ],
                       ),

@@ -71,20 +71,18 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
 
   void _calCulateTotalPaid() {
     double paid = 0;
-    for (var record in widget.credit.records) {paid += (paid + record.amountPaid);}
+    for (var record in widget.credit.records) { paid = paid+(record.amountPaid); }
+    double balance = widget.credit.totalAmount - paid;
 
-    final double remaining = widget.credit.totalAmount - paid;
-  
     setState(() {
       _totalPaid = paid;
-      _remaingBalance = remaining < 0 ? 0 : remaining;
+      _remaingBalance = balance < 0 ? 0 : balance;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Stack(
         children: [
 
@@ -145,6 +143,26 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
                                       children: [
                                         UiTitleWidget(text: 'phone number', bold: false,),
                                         UiTitleWidget(text: widget.credit.customer.phoneNumber),
+                                      ],
+                                    ),
+
+                                    SizedBox(height: CSizes.smallGap,),
+                              
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        UiTitleWidget(text: 'address', bold: false,),
+                                        UiTitleWidget(text: widget.credit.customer.address ?? '---'),
+                                      ],
+                                    ),
+
+                                    SizedBox(height: CSizes.smallGap,),
+                              
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        UiTitleWidget(text: 'tin number', bold: false,),
+                                        UiTitleWidget(text: widget.credit.customer.tinNumber ?? '---'),
                                       ],
                                     ),
                                   ],
@@ -246,6 +264,7 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
 
                               ListView.builder(
                                 shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
                                 itemCount: widget.credit.items.length,
                                 itemBuilder: (context, index) {
                                   final item = widget.credit.items[index];
@@ -310,7 +329,7 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
                                   Expanded(
                                     child: UiButtonWidget(
                                       text: 'back',
-                                      tranparent: true,
+                                      tranparent: widget.credit.totalAmount < _totalPaid,
                                       horizontalPadding: 0,
                                       onClick: () => Navigator.pop(context)
                                     )
@@ -322,6 +341,8 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
                                     child: UiButtonWidget(
                                       text: 'add new record',
                                       horizontalPadding: 0,
+                                      isDisabled: widget.credit.totalAmount >= _totalPaid,
+                                      // isDisabled: true,
                                       onClick: _toggleShowRecordForm,
                                     )
                                   )
@@ -377,6 +398,7 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
       ),
       padding: EdgeInsets.all(CSizes.mediumGap),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
           Expanded(
@@ -398,13 +420,18 @@ class _CreditDetailsScreenState extends State<CreditDetailsScreen> {
                   ),
                 ),
                     
-                UiTitleWidget(text: '${CHelperFunctions.formatNumberWithComma(record.amountPaid)} Birr', defaultText: true, bold: false,)
-                    
+                UiTitleWidget(text: '${CHelperFunctions.formatNumberWithComma(record.amountPaid)} Birr', defaultText: true, bold: false,),
               ],
             ),
           ),
 
-          UiTitleWidget(text: record.paymentName, capitalizeWords: true, bold: false,)
+          SizedBox(width: CSizes.mediumGap,),
+
+          UiTitleWidget(text: record.paymentName, capitalizeWords: true, bold: false,),
+
+          SizedBox(width: CSizes.mediumGap,),
+
+          Expanded(child: UiTitleWidget(text: CHelperFunctions.formatDateTime(record.createdAt), bold: false, textAlign: TextAlign.end,)),    
 
           // Row(
           //   children: [

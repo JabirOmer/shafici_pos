@@ -36,6 +36,7 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
   final _secureStorageService = CSecureStorageService();
   final _apiServices = CApiServices();
 
+  final _formKey = GlobalKey<FormState>();
   final _methodNameController = TextEditingController();
   final _amountController = TextEditingController();
 
@@ -45,6 +46,13 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
   String? _errorMessage;
   String? _successMessage;
   bool _isLoading = false;
+
+  String? _validateAmount(String? value) {
+    if (value == null || value.isEmpty)  return 'amount is missing';
+    if (double.tryParse(value) == null) return 'invalid amount';
+    if (double.parse(value) <= 0) return 'amount should be greater than zero';
+    return null;
+  }
 
   void _handlePaymentMethodChange(PaymentMethodModel method) {
     setState(() {
@@ -59,6 +67,8 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
   }
 
   Future<void> _handleSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
     try {
       setState(() => _isLoading = true,);
 
@@ -98,10 +108,9 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
 
   void _clearMessages() {
     if (!mounted) return;
-    setState(() {
-      _errorMessage = null;
-      _successMessage = null;
-    });
+    
+    if (_errorMessage != null) setState(() => _errorMessage = null,);
+    if (_successMessage != null) Navigator.pop(context);
   }
 
   @override
@@ -126,6 +135,7 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
                     padding: EdgeInsets.all(CSizes.largeGap),
                     margin: EdgeInsets.all(CSizes.largeGap),
                     child: Form(
+                      key: _formKey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -188,6 +198,7 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
                           if (!_showMethodsList) UiTextFieldWidget(
                             textController: _amountController,
                             label: 'amount paid',
+                            validator: (value) => _validateAmount(value),
                             fieldSubmit: (_) => _handleSubmit(),
                           ),
 

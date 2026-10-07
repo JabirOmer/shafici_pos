@@ -34,7 +34,7 @@ class CustomersTableSource extends DataTableSource {
           )
         ),
 
-        // - - - M E T H O D _ N A M E
+        // - - - N A M E
         DataCell(
           UiTitleWidget(
             text: customer.customerName,
@@ -42,7 +42,7 @@ class CustomersTableSource extends DataTableSource {
           )
         ),
 
-        // - - - M E T H O D _ A C C O U N T
+        // - - - P H O N E _ N U M B E R
         DataCell(
           UiTitleWidget(
             text: customer.phoneNumber,
@@ -50,32 +50,50 @@ class CustomersTableSource extends DataTableSource {
           )
         ),
 
-        // - - - A C T I O N S
+        // - - - A D D R E S S
         DataCell(
-          Row(
-            children: [
-              UiButtonWidget(
-                icon: CIcons.editIcon,
-                vericalPadding: CSizes.smallGap,
-                horizontalPadding: CSizes.smallGap,
-                backgroundColor: CColors.whiteShade2,
-                isDisabled: !canEdit,
-                onClick: () => onEditClick(customer)
-              ),
-
-              SizedBox(width: CSizes.mediumGap,),
-
-              UiButtonWidget(
-                icon: CIcons.trashIcon,
-                vericalPadding: CSizes.smallGap,
-                horizontalPadding: CSizes.smallGap,
-                backgroundColor: CColors.redDimmed,
-                isDisabled: !canEdit,
-                onClick: () => onDeteleClick(customer)
-              )
-            ]
+          UiTitleWidget(
+            text: customer.address ?? '- - -',
+            bold: false,
           )
-        )
+        ),
+
+        // - - - TIN
+        DataCell(
+          UiTitleWidget(
+            text: customer.tinNumber ?? '- - -',
+            bold: false,
+          )
+        ),
+
+        // - - - A C T I O N S
+        // DataCell(
+        //   Row(
+        //     children: [
+        //       UiButtonWidget(
+        //         icon: CIcons.editIcon,
+        //         vericalPadding: CSizes.smallGap,
+        //         horizontalPadding: CSizes.smallGap,
+        //         backgroundColor: CColors.transparent,
+        //         color: CColors.black,
+        //         borderColor: CColors.whiteShade2,
+        //         isDisabled: !canEdit,
+        //         onClick: () => onEditClick(customer)
+        //       ),
+
+        //       SizedBox(width: CSizes.mediumGap,),
+
+        //       UiButtonWidget(
+        //         icon: CIcons.trashIcon,
+        //         vericalPadding: CSizes.smallGap,
+        //         horizontalPadding: CSizes.smallGap,
+        //         backgroundColor: CColors.red,
+        //         isDisabled: !canEdit,
+        //         onClick: () => onDeteleClick(customer)
+        //       )
+        //     ]
+        //   )
+        // )
       ]
     );
   }

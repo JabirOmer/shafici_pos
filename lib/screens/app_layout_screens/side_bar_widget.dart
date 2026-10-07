@@ -290,7 +290,7 @@ class SideBarWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive ? CColors.primaryColor : null,
           border: Border.all(width: 1, color: addBorder ? CColors.whiteShade2 : CColors.transparent),
-          borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
+          borderRadius: BorderRadius.circular(CSizes.mediumGap + 20)
         ),
         padding: EdgeInsets.all(CSizes.smallGap),
         child: Row(

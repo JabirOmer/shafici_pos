@@ -13,6 +13,7 @@ class UiTitleWidget extends StatelessWidget {
   final bool capitalizeWords;
   final int maxLine;
   final Color? color;
+  final bool selectable;
 
   const UiTitleWidget({
     super.key,
@@ -26,10 +27,18 @@ class UiTitleWidget extends StatelessWidget {
     this.capitalizeWords = false,
     this.maxLine = 1,
     this.color,
+    this.selectable = false
   });
 
   @override
   Widget build(BuildContext context) {
+    return selectable ? SelectionArea(child: _textMethod())
+      : _textMethod();
+  }
+
+
+
+  Widget _textMethod() {
     return Text(
       defaultText ? text : capitalizeWords ? CHelperFunctions.capitalizeWords(text) : CHelperFunctions.capitalize(text),
       textAlign: textAlign,

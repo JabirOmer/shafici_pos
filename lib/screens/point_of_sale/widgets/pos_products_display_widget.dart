@@ -459,16 +459,42 @@ class _PosProductsDisplayWidgetState extends State<PosProductsDisplayWidget> {
                     // fontWeight: FontWeight.w700
                   ),
                 ),
-                
-                // SizedBox(height: CSizes.smallGap,),
 
                 if (product.productCode != null) Text(
-                  CHelperFunctions.capitalizeWords(product.productCode!),
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: CColors.whiteShade3
+                    CHelperFunctions.capitalizeWords(product.productCode!),
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: CColors.whiteShade3
+                    ),
                   ),
+
+                  SizedBox(height: CSizes.smallGap,),
+              
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    if (product.expireDate != null) Text(
+                      CHelperFunctions.formatDateTime(product.expireDate!),
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CColors.whiteShade3
+                      ),
+                    ),
+                    if (product.expireDate == null) Text('No expire date'),
+
+                    Text(
+                      CHelperFunctions.formatNumberWithComma(product.stock),
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CColors.whiteShade3
+                      ),
+                    ),
+                  ],
                 ),
 
                 // SizedBox(height: CSizes.mediumGap,),

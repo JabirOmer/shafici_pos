@@ -35,7 +35,6 @@ class CreditModel {
       creditStatus: credit['credit_status'], 
       totalAmount: double.parse(credit['total_amount']), 
       items: (credit['items'] as List<dynamic>).map((item) => CreditItemModel.fromMap(item)).toList(), 
-      // items: [],
       records: (credit['records'] as List<dynamic>).map((record) => CreditRecordModel.fromMap(record)).toList(), 
       createdAt: DateTime.parse(credit['created_at']).toLocal()
     );

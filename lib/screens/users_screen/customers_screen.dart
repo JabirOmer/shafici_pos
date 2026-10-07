@@ -15,6 +15,7 @@ import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/data_tables/paginated_data_table_2_widget.dart';
 import 'package:shafici_pos/data_tables/source/customers_table_source.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
+import 'package:shafici_pos/models/customer_model.dart';
 import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/services/api_services.dart';
 import 'package:shafici_pos/services/secure_store_services.dart';
@@ -43,6 +44,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
   final _formKey = GlobalKey<FormState>();
   final _customerNameController = TextEditingController();
   final _customerPhoneNumberController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _tinNumberController = TextEditingController();
   bool _showRegisterForm = false;
   
   bool _isLoading = false;
@@ -57,6 +60,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   String? _validateCustomerPhoneNumber(String? value) {
     if (value == null || value.isEmpty) return 'phone number is missing';
     if (!digitsOnlyRegex.hasMatch(value)) return 'Only digits (0-9) are allowed.';
+    if (value.length < 10) return 'Phone number should be 10 digits';
     if (int.tryParse(value) == null) return 'invalid phone number';
     return null;
   }
@@ -66,6 +70,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
     context.read<CustomerCubit>().fetchCustomers();
   }
 
+  // -- -- --
   void _toggleShowRegisterForm() {
     if (!mounted) return;
     _clearMessages();
@@ -74,6 +79,16 @@ class _CustomersScreenState extends State<CustomersScreen> {
     setState(() => _showRegisterForm = !_showRegisterForm);
   }
 
+
+  // -- -- --
+  void _toggleEditCustomer(CustomerModel customer) {}
+
+
+  // -- -- --
+  void _toggleDeleteCustomer(CustomerModel customer) {}
+
+  
+  // -- -- --
   Future<void> _handleFormSubmit() async {
     if (_formKey.currentState!.validate()) {
       if (_isLoading) return;
@@ -86,6 +101,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
           "branch_id": branchId,
           "customer_name": _customerNameController.text.trim(),
           "customer_number": _customerPhoneNumberController.text.trim(),
+          "address": _addressController.text.trim(),
+          "tin_number": _tinNumberController.text.trim(),
         };
         
         final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
@@ -196,15 +213,21 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                   label: UiTitleWidget(text: 'phone number', color: CColors.whiteShade1, medium: true,),
                                 ),
                                 DataColumn2(
-                                  label: UiTitleWidget(text: 'delete', color: CColors.whiteShade1, medium: true,),
-                                  fixedWidth: 200
+                                  label: UiTitleWidget(text: 'Address', color: CColors.whiteShade1, medium: true,),
                                 ),
+                                DataColumn2(
+                                  label: UiTitleWidget(text: 'Tin', color: CColors.whiteShade1, medium: true,),
+                                ),
+                                // DataColumn2(
+                                //   label: UiTitleWidget(text: 'actions', color: CColors.whiteShade1, medium: true,),
+                                //   fixedWidth: 100
+                                // ),
                               ], 
                               source: CustomersTableSource(
                                 customersDataList: state.filteredCustomersList, 
                                 canEdit: context.read<AppInfoProvider>().currentUser?.canEditInventory ?? false, 
-                                onEditClick: (customer) {}, 
-                                onDeteleClick: (customer) {}
+                                onEditClick: (customer) => _toggleEditCustomer(customer), 
+                                onDeteleClick: (customer) => _toggleDeleteCustomer(customer)
                               )
                             ),
                           )
@@ -260,7 +283,20 @@ class _CustomersScreenState extends State<CustomersScreen> {
                             textController: _customerPhoneNumberController,
                             label: 'phone number',
                             validator: (value) => _validateCustomerPhoneNumber(value),
-                            fieldSubmit: (_) => _handleFormSubmit(),
+                          ),
+                      
+                          SizedBox(height: CSizes.largeGap,),
+                          
+                          UiTextFieldWidget(
+                            textController: _addressController,
+                            label: 'address',
+                          ),
+                      
+                          SizedBox(height: CSizes.largeGap,),
+                          
+                          UiTextFieldWidget(
+                            textController: _tinNumberController,
+                            label: 'tin number',
                           ),
                       
                           SizedBox(height: CSizes.largeGap,),
@@ -329,29 +365,29 @@ class _CustomersScreenState extends State<CustomersScreen> {
         children: [
           Row(
             children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 300),
-                child: UiTextFieldWidget(
-                  label: 'Search customer name or number',
-                  defaultLabel: true,
-                  // textController: _searchController,
-                  // onChange: (value) => _handleSearch(value),
-                ),
-              ),
+              // ConstrainedBox(
+              //   constraints: BoxConstraints(maxWidth: 300),
+              //   child: UiTextFieldWidget(
+              //     label: 'Search customer name or number',
+              //     defaultLabel: true,
+              //     // textController: _searchController,
+              //     // onChange: (value) => _handleSearch(value),
+              //   ),
+              // ),
 
-              // if (_searchController.text.isNotEmpty) Container(
-              Container(
-                margin: EdgeInsets.only(left: CSizes.mediumGap,),
-                child: UiButtonWidget(
-                  icon: CIcons.eraseIcon,
-                  vericalPadding: CSizes.smallGap,
-                  horizontalPadding: CSizes.smallGap,
-                  // onClick: _handleSearchReset,
-                  onClick: () {},
-                ),
-              ),
+              // // if (_searchController.text.isNotEmpty) Container(
+              // Container(
+              //   margin: EdgeInsets.only(left: CSizes.mediumGap,),
+              //   child: UiButtonWidget(
+              //     icon: CIcons.eraseIcon,
+              //     vericalPadding: CSizes.smallGap,
+              //     horizontalPadding: CSizes.smallGap,
+              //     // onClick: _handleSearchReset,
+              //     onClick: () {},
+              //   ),
+              // ),
 
-              SizedBox(width: CSizes.mediumGap,),
+              // SizedBox(width: CSizes.mediumGap,),
           
               UiButtonWidget(
                 icon: CIcons.refreshIcon,

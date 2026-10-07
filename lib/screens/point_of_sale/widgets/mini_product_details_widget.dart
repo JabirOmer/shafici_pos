@@ -66,15 +66,17 @@ class MiniProductDetailsWidget extends StatelessWidget {
                                   child: UiTitleWidget(
                                     text: CHelperFunctions.capitalizeWords(product.productName),
                                     bigger: true,
+                                    maxLine: 2,
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                                SizedBox(width: CSizes.smallGap),
-                                if (!product.isTaxable) Image.asset(
-                                  'assets/images/tax-free-tag.png', 
-                                  fit: BoxFit.contain,
-                                  width: 32,
-                                  height: 32,
-                                )
+                                // SizedBox(width: CSizes.smallGap),
+                                // if (!product.isTaxable) Image.asset(
+                                //   'assets/images/tax-free-tag.png', 
+                                //   fit: BoxFit.contain,
+                                //   width: 32,
+                                //   height: 32,
+                                // )
                               ],
                             ),
                       
@@ -83,7 +85,7 @@ class MiniProductDetailsWidget extends StatelessWidget {
                               height: 1,
                               margin: EdgeInsets.symmetric(vertical: CSizes.mediumGap),
                             ),
-                          
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -113,6 +115,24 @@ class MiniProductDetailsWidget extends StatelessWidget {
                       
                                 UiTitleWidget(
                                   text: product.productBarcode,
+                                  bold: false,
+                                )
+                              ],
+                            ),
+
+                            SizedBox(height: CSizes.mediumGap,),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                UiTitleWidget(
+                                  text: 'product_id',
+                                  bold: false,
+                                  color: CColors.blackShade3,
+                                ),
+                      
+                                UiTitleWidget(
+                                  text: product.productId,
                                   bold: false,
                                 )
                               ],

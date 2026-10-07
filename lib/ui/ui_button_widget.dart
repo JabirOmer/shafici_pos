@@ -64,7 +64,7 @@ class UiButtonWidget extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: isDisabled ? CColors.whiteShade2 : backgroundColor ?? (tranparent ? CColors.transparent : CColors.primaryColor),
-            borderRadius: BorderRadius.circular(borderRaduis ?? CSizes.smallRadius + 20),
+            borderRadius: BorderRadius.circular(borderRaduis ?? CSizes.mediumGap + 20),
             border: Border.all(width: 1, color: borderColor ?? ((tranparent || isDisabled) ? CColors.whiteShade2 : color ?? buttonColor)),
             boxShadow: addShadow ? CShadows.shadow1 : null
           ),
@@ -86,6 +86,7 @@ class UiButtonWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
                 color: isDisabled ? CColors.blackShade3 : color ?? (tranparent ? CColors.blackShade1 : CColors.whiteShade1),
                 bigger: biggerText,
+                selectable: false,
               ),
 
               if (text != null && icon != null) SizedBox(width: CSizes.mediumGap,),
