@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shafici_pos/app.dart';
@@ -50,7 +51,7 @@ class _VerifyDeviceScreenState extends State<VerifyDeviceScreen> {
         "device_name": await _getDeviceName()
       };
 
-      final response = await _apiServices.patchRequest(url: CUrlStrings.verifyVerificationCode, data: formData);
+      final response = await _apiServices.patchRequest(url: CUrlStrings.verifyVerificationCode, queryParams: {}, data: formData);
       if (!mounted) return;
 
       switch (response.statusCode) {
@@ -59,13 +60,12 @@ class _VerifyDeviceScreenState extends State<VerifyDeviceScreen> {
           await _secureStorageService.write(CSecureStrings.deviceToken, token);
           await _appInfoProvider.getAuthStatusEnum();
           if (!mounted) return;
-          // CHelperFunctions.navigateToScreen(context: context, screen: App(), replacement: true);
         }
 
         default: setState(() => _errorMessage = response.data);
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) print(e);
       setState(() => _errorMessage = 'Failed to send code');
     } finally {
       if (mounted) {

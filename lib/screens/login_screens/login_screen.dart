@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       };
 
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.postRequest(url: CUrlStrings.loginUrl, data: formData, authToken: deviceToken);
+      final response = await _apiServices.postRequest(url: CUrlStrings.loginUrl, queryParams: {}, data: formData, authToken: deviceToken);
       if (!mounted) return;
 
       switch (response.statusCode) {

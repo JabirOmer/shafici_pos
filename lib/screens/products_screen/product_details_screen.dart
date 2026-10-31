@@ -86,10 +86,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ).toJson()..addAll({ "product_id": product.productId });
 
 
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.patchRequest(url: CUrlStrings.updateProductUrl, data: dataMap, authToken: deviceToken);
-
-      print(dataMap);
+      final response = await _apiServices.patchRequest(url: CUrlStrings.updateProductUrl, queryParams: queryParams, data: dataMap, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 200: {
@@ -128,8 +127,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         'product_id': widget.product.productId
       };
 
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.patchRequest(url: CUrlStrings.setNewBarcodeUrl, data: dataMap, authToken: deviceToken);
+      final response = await _apiServices.patchRequest(url: CUrlStrings.setNewBarcodeUrl, queryParams: queryParams, data: dataMap, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 200: _successMessage = response.data['msg'];
@@ -161,8 +161,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     try {
       final dataMap = { "product_id": productId };
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.patchRequest(url: CUrlStrings.deleteProductUrl, data: dataMap, authToken: deviceToken);
+      final response = await _apiServices.patchRequest(url: CUrlStrings.deleteProductUrl, queryParams: queryParams, data: dataMap, authToken: deviceToken);
       if (!mounted) return;
 
       switch (response.statusCode) {

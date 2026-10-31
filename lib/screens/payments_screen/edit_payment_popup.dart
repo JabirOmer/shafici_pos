@@ -1,12 +1,14 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/icons.dart';
 import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/models/payment_method_model.dart';
+import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/services/api_services.dart';
 import 'package:shafici_pos/services/secure_store_services.dart';
 import 'package:shafici_pos/ui/ui_animated_mini_message_widget.dart';
@@ -72,8 +74,9 @@ class _EditPaymentPopupState extends State<EditPaymentPopup> {
 
 
     try {
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.patchRequest(url: CUrlStrings.updatePaymentMethodUrl, data: dataMap, authToken: deviceToken);
+      final response = await _apiServices.patchRequest(url: CUrlStrings.updatePaymentMethodUrl, queryParams: queryParams, data: dataMap, authToken: deviceToken);
 
       
       switch (response.statusCode) {

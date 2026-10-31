@@ -32,7 +32,7 @@ class PosOrderDisplayWidget extends StatefulWidget {
 
 class _PosOrderDisplayWidgetState extends State<PosOrderDisplayWidget> {
   late ProductsProvider _productsProvider;
-  // Timer? _rapidCallTimer;
+  final _discountController = TextEditingController();
 
   
   
@@ -52,6 +52,21 @@ class _PosOrderDisplayWidgetState extends State<PosOrderDisplayWidget> {
   Future<void> _handleDeleteSession(int sessionId) async {
     _productsProvider = Provider.of<ProductsProvider>(context, listen: false);
     await _productsProvider.deleteOrderSession(sessionId);
+  }
+
+
+  // -- -- --
+  Future<void> _handleDiscountChange(String value) async {
+    _productsProvider = Provider.of<ProductsProvider>(context, listen: false);
+    final discount = double.tryParse(value) ?? 0.00;
+    await _productsProvider.handleDiscountChange(discount);
+  }
+
+  void _handleSessionChange(int sessionId) {
+    _productsProvider = Provider.of<ProductsProvider>(context, listen: false);
+    _productsProvider.setActiveSession(sessionId);
+
+    _discountController.text = _productsProvider.activeSessionCalc?.discount.toString() ?? '';
   }
 
   @override
@@ -109,7 +124,7 @@ class _PosOrderDisplayWidgetState extends State<PosOrderDisplayWidget> {
                 orderSessions: productsProvider.orderSessions,
                 addNewSession: productsProvider.createOrderSession,
                 activeSessionId: productsProvider.activeSessionId,
-                changeActiveSessionId: (sessionId) => productsProvider.setActiveSession(sessionId),
+                changeActiveSessionId: (sessionId) => _handleSessionChange(sessionId),
               ),
 
     
@@ -147,7 +162,13 @@ class _PosOrderDisplayWidgetState extends State<PosOrderDisplayWidget> {
 
               // - - - D I S P L A Y _ O R D E R _ C A L C U L A T I O N S
               if (productsProvider.activeSessionCalc != null) Container(
-                margin: EdgeInsets.all(CSizes.largeGap),
+                padding: EdgeInsets.only(
+                  left: CSizes.mediumGap,
+                  right: CSizes.mediumGap,
+                  top: CSizes.mediumGap,
+                  bottom: CSizes.largeGap,
+                ),
+                // color: CColors.whiteShade1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -179,10 +200,12 @@ class _PosOrderDisplayWidgetState extends State<PosOrderDisplayWidget> {
 
                     UiOrderCalculationSummaryWidget(
                       orderCalculation: productsProvider.activeSessionCalc!,
+                      onDiscountChange: (value) => _handleDiscountChange(value),
+                      discountController: _discountController,
                     ),
-
+                    
                     SizedBox(height: CSizes.mediumGap,),
-
+                  
                     IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -208,8 +231,6 @@ class _PosOrderDisplayWidgetState extends State<PosOrderDisplayWidget> {
                         ],
                       ),
                     ),
-
-                
                     // SizedBox(height: CSizes.mediumGap,),
                   ],
                 ),

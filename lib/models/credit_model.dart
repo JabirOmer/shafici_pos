@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:shafici_pos/models/credit_item_model.dart';
 import 'package:shafici_pos/models/credit_record_model.dart';
 import 'package:shafici_pos/models/customer_model.dart';
-import 'package:shafici_pos/models/order_item_model.dart';
 
 class CreditModel {
   final String branchId;

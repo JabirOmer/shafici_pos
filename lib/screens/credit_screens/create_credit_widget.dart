@@ -18,11 +18,13 @@ import 'package:shafici_pos/ui/ui_text_field_widget.dart';
 import 'package:shafici_pos/ui/ui_title_widget.dart';
 
 class CreateCreditWidget extends StatefulWidget {
-  final void Function(CustomerModel customer, double amount) onSubmit;
+  final void Function(double amount) onSubmit;
+  final CustomerModel? customer;
   final void Function() onCancel;
 
   const CreateCreditWidget({
     super.key,
+    required this.customer,
     required this.onSubmit,
     required this.onCancel,
   });
@@ -32,15 +34,10 @@ class CreateCreditWidget extends StatefulWidget {
 }
 
 class _CreateCreditWidgetState extends State<CreateCreditWidget> {
-  final _secureStorageService = CSecureStorageService();
-  final _apiServices = CApiServices();
-
   final _formKey = GlobalKey<FormState>();
-  final _customerNameController = TextEditingController(); 
   final _creditAmountController = TextEditingController(); 
-  CustomerModel? _selectedCustomer;
 
-  bool _showCustomersList = true;
+  // final bool _showCustomersList = true;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -50,17 +47,23 @@ class _CreateCreditWidgetState extends State<CreateCreditWidget> {
   // - - - - - - F U N C T I O N S
 
   // -- -- --
-  void _toggleShowCustomersList() {
-    setState(() => _showCustomersList = !_showCustomersList);
-  }
+  // void _toggleShowCustomersList() {
+  //   setState(() => _showCustomersList = !_showCustomersList);
+  // }
 
   // -- -- --
-  void _handleCustomerChange(CustomerModel customer) {
-    setState(() {
-      _selectedCustomer = customer;
-      _customerNameController.text = customer.customerName;
-    });
-    _toggleShowCustomersList();
+  // void _handleCustomerChange(CustomerModel customer) {
+  //   setState(() {
+  //     _selectedCustomer = customer;
+  //     _customerNameController.text = customer.customerName;
+  //   });
+  //   _toggleShowCustomersList();
+  // }
+
+  static String? _validateAmount(String? value) {
+    if (value == null || value.isEmpty) return 'This field is missing';
+    if (double.tryParse(value) == null) return 'Invalid number';
+    return null;
   }
 
   // -- -- --
@@ -71,7 +74,7 @@ class _CreateCreditWidgetState extends State<CreateCreditWidget> {
       try {
         setState(() => _isLoading = false,);
 
-        final customer = _selectedCustomer;
+        final customer = widget.customer;
         final amount = double.tryParse(_creditAmountController.text);
 
         if (customer == null) {
@@ -84,7 +87,7 @@ class _CreateCreditWidgetState extends State<CreateCreditWidget> {
           return;
         }
         
-        widget.onSubmit(customer, amount);
+        widget.onSubmit(amount);
       }
       finally {
         setState(() => _isLoading = false,);
@@ -130,61 +133,62 @@ class _CreateCreditWidgetState extends State<CreateCreditWidget> {
                       SizedBox(height: CSizes.largeGap,),
                         
                       // - - - C U S T O M E R
-                      if (!_showCustomersList)  UiTextFieldWidget(
-                        textController: _customerNameController,
+                      UiTextFieldWidget(
                         label: 'Customer',
-                        onTap: _toggleShowCustomersList,
+                        readOnly: true,
+                        initialValue: widget.customer?.customerName,
                       ),
                         
-                      if (!_showCustomersList)  SizedBox(height: CSizes.largeGap,),
+                      SizedBox(height: CSizes.largeGap,),
 
                       // - - - L I S T
-                      if (_showCustomersList) ConstrainedBox(
-                        constraints: BoxConstraints( maxHeight: 400,  ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: CColors.whiteShade1,
-                            border: Border.all(width: 1, color: CColors.whiteShade2),
-                            borderRadius: BorderRadius.circular(CSizes.largeGap)
-                          ),
-                          margin: EdgeInsets.only(bottom: CSizes.largeGap),
-                          child: BlocBuilder<CustomerCubit, CustomerState>(
-                            builder: (context, state) {
-                              if (state.customersDataList.isEmpty) {
-                                return Padding(
-                                  padding: EdgeInsets.all(CSizes.largeGap),
-                                  child: UiTitleWidget(text: 'No customers are founded', bold: false,)
-                                );
-                              }
-                              return ListView.separated(
-                                padding: EdgeInsets.all(CSizes.largeGap),
-                                shrinkWrap: true,
-                                physics: AlwaysScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  final customer = state.customersDataList[index];
-                                  return _customerListTile(
-                                    index: index,
-                                    customer: customer,
-                                    onClick: () => _handleCustomerChange(customer)
-                                  );
-                                }, 
-                                separatorBuilder: (context, index) => Divider( height: 1, color: CColors.whiteShade2, indent: 47, ), 
-                                itemCount: state.customersDataList.length
-                              );
-                            },
-                          ),
-                        ),
-                      ),
+                      // if (_showCustomersList) ConstrainedBox(
+                      //   constraints: BoxConstraints( maxHeight: 400,  ),
+                      //   child: Container(
+                      //     decoration: BoxDecoration(
+                      //       color: CColors.whiteShade1,
+                      //       border: Border.all(width: 1, color: CColors.whiteShade2),
+                      //       borderRadius: BorderRadius.circular(CSizes.largeGap)
+                      //     ),
+                      //     margin: EdgeInsets.only(bottom: CSizes.largeGap),
+                      //     child: BlocBuilder<CustomerCubit, CustomerState>(
+                      //       builder: (context, state) {
+                      //         if (state.customersDataList.isEmpty) {
+                      //           return Padding(
+                      //             padding: EdgeInsets.all(CSizes.largeGap),
+                      //             child: UiTitleWidget(text: 'No customers are founded', bold: false,)
+                      //           );
+                      //         }
+                      //         return ListView.separated(
+                      //           padding: EdgeInsets.all(CSizes.largeGap),
+                      //           shrinkWrap: true,
+                      //           physics: AlwaysScrollableScrollPhysics(),
+                      //           itemBuilder: (context, index) {
+                      //             final customer = state.customersDataList[index];
+                      //             return _customerListTile(
+                      //               index: index,
+                      //               customer: customer,
+                      //               onClick: () => _handleCustomerChange(customer)
+                      //             );
+                      //           }, 
+                      //           separatorBuilder: (context, index) => Divider( height: 1, color: CColors.whiteShade2, indent: 47, ), 
+                      //           itemCount: state.customersDataList.length
+                      //         );
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
                         
                         
                       // - - - A M O U N T
-                      if (!_showCustomersList) UiTextFieldWidget(
+                      UiTextFieldWidget(
                         textController: _creditAmountController,
                         label: 'total amount',
+                        validator: (value) => _validateAmount(value),
                         fieldSubmit: (_) => _handleSubmit(),
                       ),
 
-                      if (!_showCustomersList)  SizedBox(height: CSizes.largeGap,),
+                       SizedBox(height: CSizes.largeGap,),
 
                       UiFormMessage(message: _errorMessage),
                         
@@ -199,9 +203,9 @@ class _CreateCreditWidgetState extends State<CreateCreditWidget> {
                             )
                           ),
                         
-                          if (!_showCustomersList)  SizedBox(width: CSizes.mediumGap,),
+                          SizedBox(width: CSizes.mediumGap,),
                         
-                          if (!_showCustomersList)  Expanded(
+                          Expanded(
                             child: UiButtonWidget(
                               text: 'add',
                               onClick: _handleSubmit

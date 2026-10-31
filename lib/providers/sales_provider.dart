@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shafici_pos/constants/hive_strings.dart';
 import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
+import 'package:shafici_pos/models/credit_model.dart';
 import 'package:shafici_pos/models/order_data_model.dart';
 import 'package:shafici_pos/models/sale_data_model.dart';
 import 'package:shafici_pos/models/user_model.dart';
@@ -59,18 +60,22 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final dataMap = { 
+      final queryParams = {
+        'user_id': appInfoProvider.currentUser?.userId,
         "start_date": salesDate.toIso8601String(),
         "end_date": salesDate.toIso8601String()
       };
 
-      final response = await _apiServices.postRequest(url: CUrlStrings.getSalesUrl, data: dataMap, authToken: deviceToken);
+      final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
+      final response = await _apiServices.getRequest(url: CUrlStrings.getSalesUrl, queryParams: queryParams, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 200: {
           final List<dynamic> data = response.data;
           final List<SaleDataModel> salesData = data.map((sale) => SaleDataModel.fromMap(sale)).toList();
+          final CreditModel credit = CreditModel.fromMap(data[0]['credit']);
+
+          print(credit.totalAmount);
 
           // - - - filter out
           final userData  = appInfoProvider.currentUser;
@@ -115,9 +120,11 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
       final dataMap = { "order_data": order.toJson() };
-      final response = await _apiServices.postRequest(url: CUrlStrings.sendOrderUrl, data: dataMap, authToken: deviceToken);
+      final queryParams = { 'user_id': appInfoProvider.currentUser?.userId };
+      
+      final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
+      final response = await _apiServices.postRequest(url: CUrlStrings.sendOrderUrl, data: dataMap, queryParams: queryParams, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 201: {
@@ -127,7 +134,7 @@ class SalesProvider extends ChangeNotifier {
         default: _sendErrorMessage = response.data;
       }
     } catch (e) {
-      _sendErrorMessage = 'failed to resend';
+      _sendErrorMessage = 'failed to send';
 
       if (!resend && saleData != null) {
         final addedToOffline = await addToOfflineOrders(saleData);

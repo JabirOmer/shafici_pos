@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/shared_prefs_keys.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
+import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/services/api_services.dart';
 import 'package:shafici_pos/services/secure_store_services.dart';
 import 'package:shafici_pos/services/shared_preferences_services.dart';
@@ -82,12 +84,14 @@ class _ChangeExchangeRateWidgetState extends State<ChangeExchangeRateWidget> {
       } else {
         try {
           setState(() => _isLoading = true);
+          if (!mounted) return;
 
           final data = { 
             'exchange_rate': _newExchangeController.text 
           };
+          final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
           final token = await _secureStorageService.read(CSecureStrings.deviceToken);
-          final response = await _apiServices.patchRequest(url: CUrlStrings.updateExchangeRateUrl, data: data, authToken: token);
+          final response = await _apiServices.patchRequest(url: CUrlStrings.updateExchangeRateUrl, queryParams: queryParams, data: data, authToken: token);
           if (!mounted) return;
 
           switch (response.statusCode) {

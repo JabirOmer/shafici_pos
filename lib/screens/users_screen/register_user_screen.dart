@@ -6,6 +6,7 @@ import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
+import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/providers/users_provider.dart';
 import 'package:shafici_pos/screens/app_layout_screens/responsive_app_layout_screen.dart';
 import 'package:shafici_pos/services/api_services.dart';
@@ -118,8 +119,9 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
           "phone_number": _phoneNumberController.text.toLowerCase().trim(),
           "password": _pinController.text.trim()
         };
+        final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
         final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-        final response = await _apiServices.postRequest(url: CUrlStrings.registerUserUrl, data: dataMap, authToken: deviceToken);
+        final response = await _apiServices.postRequest(url: CUrlStrings.registerUserUrl, queryParams: queryParams, data: dataMap, authToken: deviceToken);
 
         switch (response.statusCode) {
           case 201: {

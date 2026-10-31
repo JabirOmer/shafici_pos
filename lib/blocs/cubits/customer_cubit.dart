@@ -25,47 +25,33 @@ class CustomerCubit extends Cubit<CustomerState> {
   // - - - - - - F E T C H _ C U S T O M E R S
   Future<void> fetchCustomers() async {
     if (state.isLoading) return;
-    print(1);
 
     final branchId = _appInfoProvider.deviceData?.branchId;
-    if (branchId == null) {
-      emit(state.copyWith( errorMessage: 'Failed to get branch id' ));
-    }
-    print(2);
+    if (branchId == null) emit(state.copyWith( errorMessage: 'Failed to get branch id' ));
 
     emit(state.copyWith( isLoading: true, clearError: true ));
-    print(3);
-
-    // await Future.delayed(Duration(seconds: 2));
 
     try {
+      final queryParams = { 'user_id': _appInfoProvider.currentUser?.userId };
+
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      print(4);
-      final response = await _apiServices.getRequest(url: CUrlStrings.getCustomers, authToken: deviceToken);
-      print(5);
+      final response = await _apiServices.getRequest(url: CUrlStrings.getCustomers, queryParams: queryParams, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 200: {
-          print(6);
           final List<dynamic> data = response.data;
-          print(7);
           final List<CustomerModel> customers = data.map((customer) => CustomerModel.fromMap(customer)).toList();
-          print(8);
-          
           emit(state.copyWith( customersDataList: customers, filteredCustomersList: customers ));
-          print(9);
         }
 
-        default: {print(9); emit(state.copyWith( errorMessage: response.data ));}
+        default: emit(state.copyWith( errorMessage: response.data ));
       }
 
     } 
     catch (e) {
-      print(10);
       emit(state.copyWith( errorMessage: 'Failed to get customers data' ));
     }
     finally {
-      print('done');
       emit(state.copyWith( isLoading: false ));
     }
   }

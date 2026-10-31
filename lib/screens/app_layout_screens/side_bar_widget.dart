@@ -76,7 +76,8 @@ class SideBarWidget extends StatelessWidget {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(CSizes.mediumGap),
                                   child: Image.asset(
-                                    'assets/images/shafici-logo.jpg',
+                                    // 'assets/images/shafici-logo.jpg',
+                                    'assets/images/mizan-logo-small-and-rounded.png',
                                     height: 60,
                                   ),
                                 ),
@@ -85,7 +86,8 @@ class SideBarWidget extends StatelessWidget {
                             
                                 FittedBox(
                                   child: UiTitleWidget(
-                                    text: 'Shafici POS',
+                                    // text: 'Shafici POS',
+                                    text: 'Mizan POS',
                                     medium: true,
                                     color: CColors.white,
                                     defaultText: true,

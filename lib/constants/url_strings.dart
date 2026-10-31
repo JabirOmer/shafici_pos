@@ -61,4 +61,5 @@ class CUrlStrings {
 
   // - - - C R E D I T S _ R E C O R D S
   static String registerCreditRecord = '$baseUrl/credits/register-record'; // add branch id as a params
+  static String deleteCreditRecord = '$baseUrl/credits/delete-record'; 
 }

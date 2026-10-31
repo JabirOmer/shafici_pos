@@ -105,8 +105,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
           "tin_number": _tinNumberController.text.trim(),
         };
         
+        final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
         final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-        final response = await _apiServices.postRequest(url: CUrlStrings.registerCustomer, data: dataMap, authToken: deviceToken);
+        final response = await _apiServices.postRequest(url: CUrlStrings.registerCustomer, queryParams: queryParams, data: dataMap, authToken: deviceToken);
         if (!mounted) return;
         
         switch (response.statusCode) {

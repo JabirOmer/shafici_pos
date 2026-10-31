@@ -35,7 +35,7 @@ class ProductsProvider extends ChangeNotifier {
   final Box<OrderSessionModel> _orderSessionsBox = Hive.box<OrderSessionModel>(CHiveStrings.orderSessionsBox);
 
   // Prefs
-  bool get onDiscount => _sharedPreferencesServices.getBool(CSharedPrefsKeys.onDiscount) ?? false;
+  // bool get onDiscount => _sharedPreferencesServices.getBool(CSharedPrefsKeys.onDiscount) ?? false;
   bool get addVAT => _sharedPreferencesServices.getBool(CSharedPrefsKeys.calculateVAT) ?? false;
 
   // Local variables
@@ -56,7 +56,7 @@ class ProductsProvider extends ChangeNotifier {
 
   // - - - INSTANCES
   OrderSessionModel? get activeSessionData => _orderSessionsBox.values.firstWhereOrNull((s) => s.sessionId == activeSessionId);
-  OrderCalculationModel? get activeSessionCalc => activeSessionData == null ? null : _calculateSession(onDiscount: onDiscount, addVAT: addVAT);
+  OrderCalculationModel? get activeSessionCalc => activeSessionData == null ? null : _calculateSession(addVAT: addVAT);
   // - - -
   List<ProductModel> get lowStockProducts => _getLowProducts();
   List<ProductModel> get outOfStockProducts => _getOutOfStockProducts();
@@ -220,6 +220,7 @@ class ProductsProvider extends ChangeNotifier {
   void setActiveSession(int sessionId) {
     _activeSessionId = sessionId;
     notifyListeners();
+
     _sendOrderDataToDisplay();
   }
 
@@ -281,9 +282,9 @@ class ProductsProvider extends ChangeNotifier {
     } 
     else {
       // final availableQty = product.stock;
-      final currentQty = session.items[itemIndex].quantity;
-
+      // final currentQty = session.items[itemIndex].quantity;
       // if (availableQty <= currentQty) return;
+
       session.items[itemIndex].quantity += 1;
     }
     notifyListeners();
@@ -338,23 +339,34 @@ class ProductsProvider extends ChangeNotifier {
 
   // - - - - - - >>
   // - - - S E S S I O N _ C A L C U L A T I O N S
+  Future<void> handleDiscountChange(double discount) async {
+    final OrderSessionModel? session = activeSessionData;
+    if (session == null) return;
 
-  // OrderSessionModel? _getActiveSessionData() {
-  //   if (_orderSessionsBox.isEmpty) return null;
-  //   return _orderSessionsBox.values.firstWhere((s) => s.sessionId == _activeSessionId);
-  // }
+    final newSessionData = OrderSessionModel(
+      sessionId: session.sessionId, 
+      items: session.items,
+      discount: discount
+    );
+    notifyListeners();
+
+    await _orderSessionsBox.put(activeSessionId, newSessionData);
+    notifyListeners();
+
+    _calculateSession(addVAT: addVAT);
+  }
 
 
   // Func 1.3
-  OrderCalculationModel _calculateSession({ required bool onDiscount, required bool addVAT }) {
+  OrderCalculationModel _calculateSession({ required bool addVAT }) {
     final OrderSessionModel? session = activeSessionData;
 
     if (session == null) return OrderCalculationModel(subtotal: 0, discount: 0, taxable: 0, vat: 0, grandTotal: 0, totalCost: 0);
 
     double subtotal = _calculateSessionSubtotal(session);
     // double discount = onDiscount ? subtotal - _calculateSessionDiscount(session) : 0;
-    double discount = 0; 
-    double taxable = _calculateSessionTaxable(session, onDiscount);   
+    double discount = session.discount; 
+    double taxable = _calculateSessionTaxable(session,);   
     double vat = addVAT ? (taxable * 0.15) : 0;
     double grandTotal = (subtotal-discount)+vat;
     double totalCost = _calculateSessionCost(session);
@@ -385,23 +397,23 @@ class ProductsProvider extends ChangeNotifier {
     return onDiscount;
   }
 
-  double _calculateSessionTaxable(OrderSessionModel session, bool onDiscount) {
+  double _calculateSessionTaxable(OrderSessionModel session,) {
     double taxable = 0;
     for (var item in session.items) {
       // if (!item.isTaxable) continue;
       // if (onDiscount) taxable += (item.quantity * item.onDiscount);
       // taxable = item.unitSoldAt * item.quantity;
-      print('\n');
+      // print('\n');
       if (item.isTaxable) {
-        print('${item.productName} is taxable');
+        // print('${item.productName} is taxable');
         taxable = taxable + (item.unitSoldAt * item.quantity);
       } else {
-        print('${item.productName} is not taxable');
+        // print('${item.productName} is not taxable');
       }
 
     }
 
-    print('Total taxable: $taxable');
+    // print('Total taxable: $taxable');
     return taxable;
   }
 
@@ -433,7 +445,7 @@ class ProductsProvider extends ChangeNotifier {
 
   // -- -- --
   Future<void> manuallyRecalculate() async {
-    _calculateSession(onDiscount: onDiscount, addVAT: addVAT);
+    _calculateSession( addVAT: addVAT);
     await _sendOrderDataToDisplay();
   }
 

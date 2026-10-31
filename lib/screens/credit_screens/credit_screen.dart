@@ -53,7 +53,10 @@ class _CreditScreenState extends State<CreditScreen> {
 
   // -- -- --
   void _navigateToDetails(CreditModel credit) {
-    CHelperFunctions.navigateToScreen(context: context, screen: CreditDetailsScreen(credit: credit));
+    CHelperFunctions.navigateToScreen(
+      context: context, 
+      screen: CreditDetailsScreen(creditId: credit.creditId)
+    );
   }
 
   Future<void> _handleDownloadInvoice(CreditModel credit) async {

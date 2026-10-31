@@ -10,6 +10,7 @@ import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
 import 'package:shafici_pos/models/credit_model.dart';
 import 'package:shafici_pos/models/payment_method_model.dart';
+import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/providers/payments_provider.dart';
 import 'package:shafici_pos/services/api_services.dart';
 import 'package:shafici_pos/services/secure_store_services.dart';
@@ -19,13 +20,13 @@ import 'package:shafici_pos/ui/ui_text_field_widget.dart';
 import 'package:shafici_pos/ui/ui_title_widget.dart';
 
 class NewCreditRecordForm extends StatefulWidget {
-  final CreditModel credit;
+  final String creditId;
   final void Function() onCancel;
 
   const NewCreditRecordForm({
     super.key,
     required this.onCancel,
-    required this.credit
+    required this.creditId
   });
 
   @override
@@ -72,22 +73,21 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
     try {
       setState(() => _isLoading = true,);
 
-      await Future.delayed(Duration(seconds: 2));
-
       final dataMap = {
-        'credit_id': widget.credit.creditId, 
+        'credit_id': widget.creditId, 
         'payment_id': _selectedMethod?.paymentId,
         'amount_paid': double.tryParse(_amountController.text)
       };
-
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.postRequest(url: CUrlStrings.registerCreditRecord, data: dataMap, authToken: deviceToken);
+      final response = await _apiServices.postRequest(url: CUrlStrings.registerCreditRecord, queryParams: queryParams, data: dataMap, authToken: deviceToken);
       if (!mounted) return;
 
       switch (response.statusCode) {
         case 201: {
           _successMessage = response.data['msg'];
           context.read<CreditCubit>().fetchCredits();
+          widget.onCancel();
         }
 
         default: {
@@ -110,7 +110,8 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
     if (!mounted) return;
     
     if (_errorMessage != null) setState(() => _errorMessage = null,);
-    if (_successMessage != null) Navigator.pop(context);
+
+    // if (_successMessage != null) Navigator.pop(context);
   }
 
   @override
@@ -216,7 +217,7 @@ class _NewCreditRecordFormState extends State<NewCreditRecordForm> {
                             children: [
                               Expanded(
                                 child: UiButtonWidget(
-                                  text: 'cancel',
+                                  text: 'back',
                                   tranparent: true,
                                   isDisabled: _isLoading,
                                   onClick: widget.onCancel

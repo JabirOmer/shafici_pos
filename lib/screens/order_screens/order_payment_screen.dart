@@ -1,6 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shafici_pos/app.dart';
+import 'package:shafici_pos/blocs/cubits/customer_cubit.dart';
+import 'package:shafici_pos/blocs/states/customer_state.dart';
 import 'package:shafici_pos/constants/colors.dart';
 import 'package:shafici_pos/constants/icons.dart';
 import 'package:shafici_pos/constants/secure_strings.dart';
@@ -33,6 +38,7 @@ import 'package:shafici_pos/ui/ui_loading_screen_widget.dart';
 import 'package:shafici_pos/ui/ui_no_data_founded.dart';
 import 'package:shafici_pos/ui/ui_order_calculation_summary_widget.dart';
 import 'package:shafici_pos/ui/ui_popup_widget.dart';
+import 'package:shafici_pos/ui/ui_text_field_widget.dart';
 import 'package:shafici_pos/ui/ui_title_widget.dart';
 
 class OrderPaymentScreen extends StatefulWidget {
@@ -44,16 +50,21 @@ class OrderPaymentScreen extends StatefulWidget {
 
 class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
   late UserModel _userData;
+  late ProductsProvider _productsProvider;
 
-  final CApiServices _apiServices = CApiServices();
-  final CSecureStorageService _secureStorageService = CSecureStorageService();
+  final _apiServices = CApiServices();
+  final _secureStorageService = CSecureStorageService();
+  final _discountController = TextEditingController();
 
   double _amountPaid = 0;
-  final List<OrderPaymentModel> _paymentList = [];
+  CustomerModel? _selectedCustomer;
+  final _customerNameController = TextEditingController();
   RegisterCreditModel? _creditData;
+  final List<OrderPaymentModel> _paymentList = [];
 
-  bool _showPaymentPopup = false;
+  bool _showCustomersList = false;
   bool _showCreditPopup = false;
+  bool _showPaymentPopup = false;
   
   // bool _isLoading = false;
   // String? _errorMessage;
@@ -75,6 +86,20 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
     setState(() => _showCreditPopup = !_showCreditPopup);
   }
 
+  // -- -- --
+  void _toggleShowCustomersList() {
+    setState(() => _showCustomersList = !_showCustomersList);
+  }
+
+  // -- -- --
+  void _handleCustomerChange(CustomerModel customer) {
+    setState(() {
+      _selectedCustomer = customer;
+      _customerNameController.text = customer.customerName;
+    });
+    _toggleShowCustomersList();
+  }
+
   
   // -- -- --
   void _handleNewPayment(OrderPaymentModel payment) {
@@ -85,8 +110,10 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
 
 
   // -- -- --
-  void _handleAddCredit(CustomerModel customer, double amount) {
-    setState(() => _creditData = RegisterCreditModel(customer: customer, amount: amount));
+  void _handleAddCredit(double amount) {
+    if (_selectedCustomer == null) return;
+
+    setState(() => _creditData = RegisterCreditModel(customer: _selectedCustomer!, amount: amount));
     _toggleShowCreditPopup();
     _calculateAmountPaid();
   }
@@ -112,6 +139,13 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
     double totalCredit = _creditData?.amount ?? 0;
 
     setState(() => _amountPaid = (totalPayments + totalCredit),);
+  }
+
+  // -- -- --
+  Future<void> _handleDiscountChange(String value) async {
+    _productsProvider = Provider.of<ProductsProvider>(context, listen: false);
+    final discount = double.tryParse(value) ?? 0.00;
+    await _productsProvider.handleDiscountChange(discount);
   }
 
   
@@ -170,11 +204,16 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
 
 
   Future<void> _goBack() async {
-    final ProductsProvider productsProvider = Provider.of(context, listen: false);
+    _productsProvider = Provider.of(context, listen: false);
     final SalesProvider salesProvider = Provider.of(context, listen: false);
     salesProvider.clearSendMessage();
-    await productsProvider.clearActiveSession();
+    await _productsProvider.clearActiveSession();
     if (mounted) Navigator.pop(context);
+  }
+
+  void _clearMessage() {
+    final SalesProvider salesProvider = Provider.of(context, listen: false);
+    salesProvider.clearSendMessage();
   }
 
   
@@ -187,6 +226,15 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
     } else {
       _userData = appInfoProvider.currentUser!;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _productsProvider = Provider.of(context, listen: false);
+      _discountController.text = _productsProvider.activeSessionCalc?.discount.toString() ?? '';
+    });
   }
 
 
@@ -219,6 +267,8 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
                               UiOrderCalculationSummaryWidget(
                                 orderCalculation: productProvider.activeSessionCalc!,
                                 amountPaid: _amountPaid,
+                                onDiscountChange: (value) => _handleDiscountChange(value),
+                                discountController: _discountController,
                                 title: 'Overview',
                               ),
                           
@@ -277,29 +327,79 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
                         Padding(
                           padding: EdgeInsets.all(CSizes.largeGap),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  UiButtonWidget(
-                                    icon: CIcons.walletAdd,
-                                    text: 'credit',
-                                    tranparent: true,
-                                    vericalPadding: CSizes.smallGap,
-                                    onClick: _toggleShowCreditPopup
+                                  Expanded(
+                                    child: UiButtonWidget(
+                                      icon: CIcons.profileAdd,
+                                      text: 'customer',
+                                      tranparent: true,
+                                      vericalPadding: CSizes.smallGap,
+                                      onClick: _toggleShowCustomersList
+                                    ),
                                   ),
 
                                   SizedBox(width: CSizes.mediumGap,),
 
-                                  UiButtonWidget(
-                                    icon: CIcons.walletAdd,
-                                    text: 'add payment',
-                                    vericalPadding: CSizes.smallGap,
-                                    onClick: _toggleShowPaymentPopup
+                                  if (_selectedCustomer != null) Expanded(
+                                    child: UiButtonWidget(
+                                      icon: CIcons.walletAdd,
+                                      text: 'credit',
+                                      tranparent: true,
+                                      vericalPadding: CSizes.smallGap,
+                                      onClick: _toggleShowCreditPopup
+                                    ),
+                                  ),
+
+                                  if (_selectedCustomer != null) SizedBox(width: CSizes.mediumGap,),
+
+                                  Expanded(
+                                    child: UiButtonWidget(
+                                      icon: CIcons.walletAdd,
+                                      text: 'add payment',
+                                      vericalPadding: CSizes.smallGap,
+                                      onClick: _toggleShowPaymentPopup
+                                    ),
                                   )
                                 ],
                               ),
                                                 
+                              SizedBox(height: CSizes.largeGap,),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  UiTitleWidget(
+                                    text: 'Customer name:',
+                                    bold: false,
+                                    defaultText: true,
+                                  ),
+
+                                  UiTitleWidget(
+                                    text:  CHelperFunctions.capitalizeWords(_selectedCustomer?.customerName ?? 'unknown'),
+                                    bold: false,
+                                  )
+                                ],
+                              ),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  UiTitleWidget(
+                                    text: 'Phone number:',
+                                    bold: false,
+                                    defaultText: true,
+                                  ),
+
+                                  UiTitleWidget(
+                                    text:  _selectedCustomer?.phoneNumber ?? 'unknown',
+                                    bold: false,
+                                  )
+                                ],
+                              ),
+
                               SizedBox(height: CSizes.largeGap,),
 
                               if (_creditData != null) Container(
@@ -386,6 +486,10 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
                         ),
 
 
+                        // - - - C U S T O M E R S
+                        if (_showCustomersList) _customersListWidget(),
+
+
                         // - - - A D D _ P A Y M E N T _ P O P U P
                         if (_showPaymentPopup) PosAddPaymentPopup(
                           onCloseClick: _toggleShowPaymentPopup, 
@@ -397,7 +501,8 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
                         // - - - A D D _ C R E D I T _ P O P U P
                         if (_showCreditPopup) CreateCreditWidget(
                           onCancel: _toggleShowCreditPopup,
-                          onSubmit: (customer, amount) => _handleAddCredit(customer, amount), 
+                          customer: _selectedCustomer,
+                          onSubmit: (amount) => _handleAddCredit(amount), 
                         ),
 
                       ],
@@ -445,9 +550,11 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
               backgroundColor: CColors.transparent,
               body: UiPopupWidget(
                 message: saleProvider.sendErrorMessage!, 
-                primaryText: 'okey', 
-                primaryClick: saleProvider.clearSendMessage, 
-                outSideClick: saleProvider.clearSendMessage
+                primaryText: 'try again', 
+                primaryClick: _clearMessage, 
+                secondaryText: 'back', 
+                secondaryClick: _goBack,
+                outSideClick: () {}
               ),
             ),
     
@@ -467,6 +574,130 @@ class _OrderPaymentScreenState extends State<OrderPaymentScreen> {
           ],
         );
       },
+    );
+  }
+
+
+  ClipRRect _customersListWidget() {
+    return ClipRRect(
+      child: Container(
+        height: double.infinity,
+        color: CColors.dimmedBackgound,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: CSizes.blurSigma, sigmaY: CSizes.blurSigma),
+          child: Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: CColors.whiteShade1,
+                border: Border.all(width: 1, color: CColors.whiteShade2),
+                borderRadius: BorderRadius.circular(CSizes.largeGap)
+              ),
+              padding: EdgeInsets.all(CSizes.largeGap),
+              margin: EdgeInsets.all(CSizes.largeGap),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  UiTitleWidget(text: 'Select customer', bigger: true, ),
+                  
+                  SizedBox(height: CSizes.largeGap,),
+                  
+                  Expanded(
+                    child: BlocBuilder<CustomerCubit, CustomerState>(
+                      builder: (context, state) {
+                        if (state.customersDataList.isEmpty) {
+                          return Padding(
+                            padding: EdgeInsets.all(CSizes.largeGap),
+                            child: UiTitleWidget(text: 'No customers are founded', bold: false,)
+                          );
+                        }
+                        return ListView.separated(
+                          // padding: EdgeInsets.all(CSizes.largeGap),
+                          padding: EdgeInsets.all(0),
+                          shrinkWrap: true,
+                          physics: AlwaysScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            final customer = state.customersDataList[index];
+                            return _customerListTile(
+                              index: index,
+                              customer: customer,
+                              onClick: () => _handleCustomerChange(customer)
+                            );
+                          }, 
+                          separatorBuilder: (context, index) => Divider( height: 1, color: CColors.whiteShade2, indent: 47, ), 
+                          itemCount: state.customersDataList.length
+                        );
+                      },
+                    ),
+                  ),
+
+                  SizedBox(height: CSizes.largeGap,),
+
+                  UiButtonWidget(
+                    text: 'cancel',
+                    // backgroundColor: CColors.transparent,
+                    tranparent: true,
+                    onClick: _toggleShowCustomersList
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  GestureDetector _customerListTile({
+    required int index,
+    required CustomerModel customer,
+    required void Function() onClick
+  }) {
+    return GestureDetector(
+      onTap: onClick,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          color: CColors.transparent,
+          padding: EdgeInsets.symmetric( vertical: CSizes.smallGap, ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: CColors.whiteShade2,
+                        borderRadius: BorderRadius.circular(CSizes.mediumGap)
+                      ),
+                      margin: EdgeInsets.only(right: CSizes.mediumGap),
+                      child: Center(
+                        child: UiTitleWidget(
+                          text: (index+1).toString().padLeft(2, '0'),
+                          customSize: 10,
+                        )
+                      ),
+                    ),
+                        
+                    UiTitleWidget(text: customer.customerName, bold: false,)
+                        
+                  ],
+                ),
+              ),
+
+              SizedBox(width: CSizes.mediumGap,),
+
+              UiTitleWidget(text: customer.phoneNumber, bold: false, color: CColors.whiteShade3,)
+
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

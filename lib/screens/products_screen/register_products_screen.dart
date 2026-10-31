@@ -1,11 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/helpers/helper_functions.dart';
 import 'package:shafici_pos/models/register_product_message_model.dart';
+import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/providers/products_provider.dart';
 import 'package:shafici_pos/screens/app_layout_screens/responsive_app_layout_screen.dart';
 import 'package:shafici_pos/screens/products_screen/widgets/bulk_products_register_widget.dart';
@@ -59,8 +58,9 @@ class _RegisterProductsScreenState extends State<RegisterProductsScreen> {
     });
 
     try {
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.postRequest(url: CUrlStrings.registerProductUrl, data: productDataMap, authToken: deviceToken);
+      final response = await _apiServices.postRequest(url: CUrlStrings.registerProductUrl, queryParams: queryParams, data: productDataMap, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 201: {

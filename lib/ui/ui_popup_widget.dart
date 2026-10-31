@@ -101,7 +101,7 @@ class UiPopupWidget extends StatelessWidget {
                           // - - - B U T T O N S
                           Row(
                             children: [
-                              if (secondaryText != null) Expanded(
+                              if (secondaryText != null && secondaryClick != null) Expanded(
                                 child: UiButtonWidget(
                                   text: secondaryText!, 
                                   onClick: secondaryClick!,
@@ -110,7 +110,7 @@ class UiPopupWidget extends StatelessWidget {
                                 ),
                               ),
                           
-                              if (secondaryText != null) SizedBox(width: CSizes.mediumGap,),
+                              if (secondaryText != null && secondaryClick != null) SizedBox(width: CSizes.mediumGap,),
                           
                               Expanded(
                                 child: UiButtonWidget(

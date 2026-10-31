@@ -19,10 +19,15 @@ class CApiServices {
 
 
   // - - - G E T _ M E T H O D
-  Future<Response> getRequest({required String url, String? authToken}) async {
+  Future<Response> getRequest({
+    required String url,
+    Map<String, dynamic>? queryParams,
+    String? authToken,
+  }) async {
     try {
       final response = await _dio.get(
         url, 
+        queryParameters: queryParams,
         options: Options(headers: authToken != null ? 
           {'authorization': 'Bearer $authToken'} : 
           {'Content-Type': 'application/json'} 
@@ -67,11 +72,17 @@ class CApiServices {
 
 
   // - - - P O S T
-  Future<Response> postRequest({required String url, FormData? formData, required Map<String, dynamic> data, String? authToken}) async {
+  Future<Response> postRequest({
+    required String url, FormData? formData, 
+    required Map<String, dynamic> data, 
+    required Map<String, dynamic> queryParams,
+    String? authToken
+  }) async {
     try {
       final response = await _dio.post(
         url, 
         data: formData ?? data, 
+        queryParameters: queryParams,
         options: Options( headers: authToken != null ? 
           {'authorization': 'Bearer $authToken'} : 
           {'Content-Type': 'application/json'} 
@@ -115,11 +126,17 @@ class CApiServices {
 
 
   // - - - P A T C H
-  Future<Response> patchRequest({required String url, required Map<String, dynamic> data, String? authToken}) async {
+  Future<Response> patchRequest({
+    required String url, 
+    required Map<String, dynamic> data, 
+    required Map<String, dynamic> queryParams,
+    String? authToken
+  }) async {
     try {
       final response = await _dio.patch(
         url, 
         data: data, 
+        queryParameters: queryParams,
         options: Options( headers: authToken != null ? 
           {'authorization': 'Bearer $authToken'} : 
           {'Content-Type': 'application/json'} 
@@ -160,11 +177,17 @@ class CApiServices {
 
 
   // - - - D E L E T E
-  Future<Response> deleteRequest({required String url, required Map<String, dynamic> data, String? authToken}) async {
+  Future<Response> deleteRequest({
+    required String url, 
+    required Map<String, dynamic> data, 
+    required Map<String, dynamic> queryParams,
+    String? authToken
+  }) async {
     try {
       final response = await _dio.delete(
         url, 
         data: data, 
+        queryParameters: queryParams,
         options: Options( headers: authToken != null ? 
           {'authorization': 'Bearer $authToken'} : 
           {'Content-Type': 'application/json'} 

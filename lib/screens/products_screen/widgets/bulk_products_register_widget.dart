@@ -440,6 +440,7 @@ import 'package:shafici_pos/constants/secure_strings.dart';
 import 'package:shafici_pos/constants/sizes.dart';
 import 'package:shafici_pos/constants/url_strings.dart';
 import 'package:shafici_pos/models/bulk_register_message_model.dart';
+import 'package:shafici_pos/providers/app_info_provider.dart';
 import 'package:shafici_pos/providers/products_provider.dart';
 import 'package:shafici_pos/screens/products_screen/register_products_screen.dart';
 import 'package:shafici_pos/screens/products_screen/widgets/bulk_register_alert_widget.dart';
@@ -536,8 +537,10 @@ class _BulkProductsRegisterWidgetState extends State<BulkProductsRegisterWidget>
         ),
       });
 
+      if (!mounted) return;
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.postRequest(url: CUrlStrings.registerBulkProductsUrl, data: {}, formData: formData, authToken: deviceToken);
+      final response = await _apiServices.postRequest(url: CUrlStrings.registerBulkProductsUrl, queryParams: queryParams, data: {}, formData: formData, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 201: {

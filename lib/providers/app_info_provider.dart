@@ -124,7 +124,7 @@ class AppInfoProvider extends ChangeNotifier {
   Future<bool> checkDeviceStatus() async {
     try {
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.getRequest(url: CUrlStrings.checkTokenStatusUrl, authToken: deviceToken);      
+      final response = await _apiServices.getRequest(url: CUrlStrings.checkTokenStatusUrl, queryParams: {}, authToken: deviceToken);
       switch (response.statusCode) {
         case 400 || 401 || 403: {
           await _secureStorageService.delete(CSecureStrings.deviceToken);

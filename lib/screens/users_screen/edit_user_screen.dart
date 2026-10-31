@@ -137,8 +137,9 @@ class _EditUserScreenState extends State<EditUserScreen> {
         ).toJson();
         dataMap.addAll({ "password": _pinController.text.isEmpty ? null : _pinController.text.trim() });
 
+        final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
         final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-        final response = await _apiServices.patchRequest(url: CUrlStrings.updateUserDataUrl, data: dataMap, authToken: deviceToken);
+        final response = await _apiServices.patchRequest(url: CUrlStrings.updateUserDataUrl, queryParams: queryParams, data: dataMap, authToken: deviceToken);
         
         switch (response.statusCode) {
           case 200: {

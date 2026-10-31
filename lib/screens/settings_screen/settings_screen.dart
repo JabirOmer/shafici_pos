@@ -52,41 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // - - - - - - >>
   // - - - F U N C T I O N S
-  // void _setSettingsData() {
-  //   final AppInfoProvider appInfoProvider = Provider.of(context, listen: false);
-  //   final WebSocketServerProvider webSocketServerProvider = Provider.of(context, listen: false);
-    
-  //   final int serverClientsCount = webSocketServerProvider.clientCount;
-  //   final bool serverIsRunning = webSocketServerProvider.serverStatus == ServerStatus.running;
-
-  //   setState(() {
-  //     _merchantInfoSettingsList = [
-  //       SettingTileModel(icon: CIcons.branchesIcon, title: 'Business name', value: appInfoProvider.deviceData?.businessName ?? '---',),
-  //       SettingTileModel(icon: CIcons.branchesIcon, title: 'Branch name', value: appInfoProvider.deviceData?.branchName ?? '---',),
-  //       SettingTileModel(icon: CIcons.branchesIcon, title: 'Add VAT', toggleValue: appInfoProvider.calculateVAT, onClick: appInfoProvider.toggleVAT),
-  //       SettingTileModel(icon: CIcons.branchesIcon, title: 'Exchange rate', onClick: _toggleExchangePopup),
-  //     ];
-
-  //     _userInfoSettingsList = [
-  //       SettingTileModel(icon: CIcons.profileIcon, title: 'Full name', value: '${appInfoProvider.currentUser?.firstName} ${appInfoProvider.currentUser?.middleName} ${appInfoProvider.currentUser?.lastName}'),
-  //       SettingTileModel(icon: CIcons.phoneIcon, title: 'Phone number', value: appInfoProvider.currentUser?.phoneNumber),
-  //       SettingTileModel(icon: CIcons.profileTag, title: 'Role', value: appInfoProvider.currentUser?.userRole),
-  //       SettingTileModel(icon: CIcons.lockIcon, title: 'Change password', onClick: _toggleChangePassword)
-  //     ];
-
-  //     _displayInfoSettingsList = [
-  //       SettingTileModel(icon: CIcons.linkIcon, title: _getServerStatus(webSocketServerProvider.serverStatus), toggleValue: serverIsRunning, onClick: () async { await webSocketServerProvider.toggleConnection(); }),
-  //       SettingTileModel(icon: CIcons.linkIcon, title: 'Address', value: '---', onClick: () {}),
-  //       SettingTileModel(icon: CIcons.linkIcon, title: 'PORT', value: '4040', onClick: _toggleChangePort),
-  //     ];
-
-  //     _redZoneSettingsList = [
-  //       SettingTileModel(icon: CIcons.logoutIcon, title: 'Logout', onClick: () {}),
-  //       SettingTileModel(icon: CIcons.warningIcon, title: 'Revoke app', onClick: _toggleShowAppRevokePopup)
-  //     ];
-  //   });
-  // }
-
+  
   void _toggleChangePassword() {
     setState(() => _showchangePINPopup = !_showchangePINPopup);
   }
@@ -120,8 +86,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _showAppRevokePopup = !_showAppRevokePopup);
 
     try {
+      final queryParams = { 'user_id': context.read<AppInfoProvider>().currentUser?.userId };
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
-      final response = await _apiServices.patchRequest(url: CUrlStrings.deviceRevokeUrl, data: {}, authToken: deviceToken);
+
+      final response = await _apiServices.patchRequest(url: CUrlStrings.deviceRevokeUrl, queryParams: queryParams, data: {}, authToken: deviceToken);
 
       switch (response.statusCode) {
         case 200: appInfoProvider.revokeDevice();
@@ -156,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final appInfoProvider = context.watch<AppInfoProvider>();
     final webSocketServerProvider = context.watch<WebSocketServerProvider>();
     
-    final int serverClientsCount = webSocketServerProvider.clientCount;
+    // final int serverClientsCount = webSocketServerProvider.clientCount;
     final bool serverIsRunning = webSocketServerProvider.serverStatus == ServerStatus.running;
 
     _merchantInfoSettingsList = [
@@ -436,266 +404,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
-
-
-
-
-  // - M E T H O D _ 1.0
-  SingleChildScrollView mainSettingsWindowMethod(AppInfoProvider appInfoProvider, WebSocketServerProvider webSocketServerProvider) {
-    final int clientsCount = webSocketServerProvider.clientCount;
-    final bool isRunning = webSocketServerProvider.serverStatus == ServerStatus.running;
-
-    return SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsetsGeometry.all(CSizes.largeGap),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [            
-              UiTitleWidget(
-                text: 'settings',
-                bigger: true,
-              ),
-      
-              SizedBox(height: CSizes.largeGap,),
-      
-              // - - - S E T T I N G S _ D I S P L A Y
-              Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 800),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // - - - Personal Information
-                      UiTitleWidget(
-                        text: 'personal information',
-                        bold: false,
-                        color: CColors.whiteShade3,
-                      ),
-                
-                      SizedBox(height: CSizes.mediumGap,),
-                      
-                      // - - - User Name
-                      settingTileDisplayMethod(
-                        icon: CIcons.profileIcon,
-                        title: 'full name', 
-                        value: '${appInfoProvider.currentUser!.firstName} ${appInfoProvider.currentUser!.middleName} ${appInfoProvider.currentUser!.lastName}'
-                      ),
-                
-                      SizedBox(height: CSizes.mediumGap,),
-                
-                      // - - - phone number
-                      settingTileDisplayMethod(
-                        icon: CIcons.phoneIcon,
-                        title: 'phone number', 
-                        value: appInfoProvider.currentUser!.phoneNumber
-                      ),
-                
-                      SizedBox(height: CSizes.mediumGap,),
-                
-                      // - - - user roles
-                      settingTileDisplayMethod(
-                        icon: CIcons.profileTag,
-                        title: 'user role', 
-                        value: appInfoProvider.currentUser!.userRole
-                      ),
-                
-                      SizedBox(height: CSizes.mediumGap,),
-
-                      // - - - Inventoy management
-                      settingTileDisplayMethod(
-                        icon: CIcons.bagIcon,
-                        isToggle: true,
-                        toggleValue: appInfoProvider.currentUser!.canEditInventory,
-                        isDisabled: true,
-                        value: 'inventory manager'
-                      ),
-                
-                      SizedBox(height: CSizes.mediumGap,),
-                
-                      // - - - change password
-                      settingTileDisplayMethod(
-                        icon: CIcons.lockIcon,
-                        value: 'change PIN', 
-                        onClick: _toggleChangePassword
-                      ),
-                      
-                      SizedBox(height: CSizes.xLargeGap,),
-                      
-                      // - - - Others
-                      UiTitleWidget(
-                        text: 'others',
-                        bold: false,
-                        color: CColors.whiteShade3,
-                      ),
-
-                      SizedBox(height: CSizes.mediumGap,),
-
-                      settingTileDisplayMethod(
-                        value: 'change exchange rate',
-                        onClick: _toggleExchangePopup
-                      ),
-
-                      SizedBox(height: CSizes.mediumGap,),
-
-                      // - - - A d d _ V A T
-                      settingTileDisplayMethod(
-                        icon: CIcons.bagIcon,
-                        isToggle: true,
-                        toggleValue: appInfoProvider.calculateVAT,
-                        toggleClick: appInfoProvider.toggleVAT,
-                        value: 'add vat'
-                      ),
-
-                      SizedBox(height: CSizes.mediumGap,),
-                      
-                      
-                      // - - - W E B _ S O C K E T
-                      Container(
-                        decoration: BoxDecoration(
-                          color: CColors.whiteShade2,
-                          borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
-                        ),
-                        padding: EdgeInsets.all(CSizes.largeGap),
-                        child: Column(
-                          children: [
-
-                            // - - - Toggle Server Connection
-                            settingTileDisplayMethod(
-                              value: '${_getServerStatus(webSocketServerProvider.serverStatus)} ${isRunning ? '( clients: $clientsCount )' : ''}', 
-                              isToggle: true, 
-                              toggleIsLoading: [ServerStatus.starting, ServerStatus.stopping].contains(webSocketServerProvider.serverStatus),
-                              toggleValue: webSocketServerProvider.serverStatus == ServerStatus.running,
-                              toggleClick: webSocketServerProvider.toggleConnection, 
-                            ),
-                      
-                            SizedBox(height: CSizes.mediumGap,),
-
-                            // - - - Port Change
-                            settingTileDisplayMethod(
-                              icon: CIcons.linkIcon,
-                              value: 'Socket PORT: ${CSharedPreferencesServices().getString(CSharedPrefsKeys.socketPort) ?? '4040'}',
-                              onClick: webSocketServerProvider.serverStatus != ServerStatus.running ? _toggleChangePort : null
-                            ),
-
-                            SizedBox(height: CSizes.mediumGap,),
-
-                            // - - - Socket Adrress Display
-                            Container(
-                              decoration: BoxDecoration(
-                                color: CColors.white,
-                                borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
-                              ),
-                              padding: EdgeInsets.all(CSizes.largeGap),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: (webSocketServerProvider.serverAddress != null && webSocketServerProvider.serverStatus == ServerStatus.running) ? CColors.green : CColors.redDimmed,
-                                          borderRadius: BorderRadius.circular(CSizes.mediumGap)
-                                        ),
-                                        padding: EdgeInsets.all(CSizes.mediumGap),
-                                      ),
-                                      SizedBox(width: CSizes.smallGap,),
-                                      UiTitleWidget(text: 'Server address: ', bold: false,)
-                                    ],
-                                  ),
-                            
-                                  UiTitleWidget(
-                                    text: webSocketServerProvider.serverStatus == ServerStatus.running ? webSocketServerProvider.serverAddress ?? 'no address is founded' : 'no address',
-                                    bold: false,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      SizedBox(height: CSizes.mediumGap,),
-
-                      // settingTileDisplayMethod(value: 'Include VAT', isDisabled: true, defaultText: true, isToggle: true, toggleValue: appInfoProvider.calculateVAT),
-                
-                      // SizedBox(height: CSizes.mediumGap,),
-
-                      // settingTileDisplayMethod(value: 'On Discount', isDisabled: true, defaultText: true, isToggle: true, toggleValue: appInfoProvider.onDiscount, ),
-                
-                      // SizedBox(height: CSizes.mediumGap,),
-
-                      Container(
-                        decoration: BoxDecoration(
-                          color: CColors.white,
-                          // border: Border.all(width: 1, color: CColors.green),
-                          borderRadius: BorderRadius.circular(CSizes.smallRadius + 20)
-                        ),
-                        padding: EdgeInsets.all(CSizes.largeGap),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                SvgPicture.asset(
-                                  CIcons.branchesIcon,
-                                ),
-
-                                SizedBox(width: CSizes.mediumGap,),
-
-                                UiTitleWidget(text: 'branch: ', bold: false,)
-                              ],
-                            ),
-                      
-                            UiTitleWidget(
-                              text: appInfoProvider.deviceData?.branchName ?? '---',
-                              bold: false,
-                            )
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: CSizes.mediumGap,),
-                
-                      Container(
-                        decoration: BoxDecoration(
-                          color: CColors.white,
-                          borderRadius: BorderRadius.circular(CSizes.smallRadius + 20),
-                          border: Border.all(width: 1, color: CColors.redDimmed)
-                        ),
-                        padding: EdgeInsets.all(CSizes.largeGap),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            UiTitleWidget(
-                              text: 'revoke app connection',
-                              bold: false,
-                            ),
-                
-                            UiButtonWidget(
-                              icon: CIcons.trashIcon,
-                              horizontalPadding: CSizes.smallGap,
-                              // color: CColors.black,
-                              backgroundColor: CColors.redDimmed,
-                              vericalPadding: CSizes.smallGap,
-                              onClick: () => setState(() => _showAppRevokePopup = true,)
-                            )
-                          ],
-                        ),
-                      ),
-                
-                
-                    ],
-                  ),
-                ),
-              )
-      
-            ],
-          ),
-        ),
-      );
-  }
-
 
 
 
