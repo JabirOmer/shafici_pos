@@ -8,9 +8,9 @@ class CApiServices {
   final _dio = Dio(
     BaseOptions(
       baseUrl: CUrlStrings.baseUrl,
-      connectTimeout: Duration(seconds: 15),
-      sendTimeout: Duration(seconds: 15),
-      receiveTimeout: Duration(seconds: 15),
+      connectTimeout: Duration(seconds: 60),
+      sendTimeout: Duration(seconds: 60),
+      receiveTimeout: Duration(seconds: 60),
     )
   );
 

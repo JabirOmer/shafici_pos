@@ -23,7 +23,6 @@ class CHelperFunctions {
     final appBarHeight = 0;
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    print('Height: $appBarHeight');
     return screenHeight - appBarHeight - topPadding - bottomPadding;
   }
 
@@ -63,7 +62,8 @@ class CHelperFunctions {
   }
 
   static String formatDateTime(DateTime date, { bool timeOnly = false, bool addTime = false, bool shortBaseMonth = false, bool normalFormat = false }) {
-    final String dateFormat = normalFormat ? 'yyyy-MM-dd' : (shortBaseMonth ? 'MM-dd-yyyy' : 'MMM - dd - yyyy');
+    // final String dateFormat = normalFormat ? 'yyyy-MM-dd' : (shortBaseMonth ? 'MM-dd-yyyy' : 'MMM - dd - yyyy');
+    final String dateFormat = normalFormat ? 'yyyy-MM-dd' : (shortBaseMonth ? 'dd-MM-yyyy' : 'MMM - dd - yyyy');
     final formattedDate = DateFormat(dateFormat).format(date);
     final formattedTime = DateFormat('hh:mm a').format(date);
     return timeOnly ? formattedTime : (addTime ? '$formattedDate   $formattedTime' : formattedDate);
@@ -71,7 +71,8 @@ class CHelperFunctions {
 
   static DateTime? formateStringToDate({ required String value }) {
     DateFormat inputFormat = DateFormat('dd-MM-yyyy');
-    return inputFormat.tryParse(value);
+    final date = inputFormat.tryParse(value);
+    return date;
   }
 
 

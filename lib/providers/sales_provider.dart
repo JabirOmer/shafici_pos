@@ -69,13 +69,17 @@ class SalesProvider extends ChangeNotifier {
       final deviceToken = await _secureStorageService.read(CSecureStrings.deviceToken);
       final response = await _apiServices.getRequest(url: CUrlStrings.getSalesUrl, queryParams: queryParams, authToken: deviceToken);
 
+      print('status: ${response.statusCode}');
+      print('status: ${response.statusMessage}');
+      print('status: ${response.data}');
+
       switch (response.statusCode) {
         case 200: {
           final List<dynamic> data = response.data;
           final List<SaleDataModel> salesData = data.map((sale) => SaleDataModel.fromMap(sale)).toList();
-          final CreditModel credit = CreditModel.fromMap(data[0]['credit']);
+          // final CreditModel credit = CreditModel.fromMap(data[0]['credit']);
 
-          print(credit.totalAmount);
+          // print(credit.totalAmount);
 
           // - - - filter out
           final userData  = appInfoProvider.currentUser;

@@ -129,6 +129,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       firstDate: DateTime(2000), 
       lastDate: DateTime(2040),
       initialDate: widget.product.expireDate,
+      initialEntryMode: DatePickerEntryMode.input,
     ).then((value) {
       setState(() {
         value == null ? 
@@ -188,7 +189,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
             batchNumber: _batchNumberController.text.isNotEmpty ? _batchNumberController.text : widget.product.batchNumber,
             updatedAt: DateTime.now()
           );
-          
           widget.onChangeSend(newData);
         } catch (e) {
           setState(() => _errorMessage = 'Failed to make change');

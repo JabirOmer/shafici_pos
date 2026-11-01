@@ -155,7 +155,8 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
     showDatePicker(
       context: context, 
       firstDate: DateTime(2000), 
-      lastDate: DateTime(2040)
+      lastDate: DateTime(2040),
+      initialEntryMode: DatePickerEntryMode.input
     ).then((value) {
       setState(() {
         value == null ? 
@@ -210,13 +211,6 @@ class _SingleProductRegisterWidgetState extends State<SingleProductRegisterWidge
     } else {
       setState(() => _profitController.text = '$formattedProfit Birr');
     }
-
-    // if ((costInBirr == null || sellingPrice == null) || sellingPrice < costInBirr) {
-    //   setState(() => _profitController.text = '0.00');  
-    // } 
-    // else {
-    //   setState(() => _profitController.text = (sellingPrice - costInBirr).toString());
-    // }
   }
 
   void handleSubmitClick() {
